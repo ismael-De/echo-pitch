@@ -1,0 +1,164 @@
+{
+  "match_id": "EP-2026-002",
+  "competition": "Echo Pitch Synthetic League (fictional)",
+  "venue": "Estuary Stadium",
+  "kickoff": "2026-10-26T15:00:00Z",
+  "pitch": {
+    "length_m": 105.0,
+    "width_m": 68.0,
+    "orientation": "home attacks towards x=105, away towards x=0, both halves"
+  },
+  "home": {
+    "code": "SHF",
+    "name": "Saltmarsh FC",
+    "city": "Saltmarsh",
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "SHF-01",
+        "name": "Sami Garrow",
+        "position": "GK",
+        "number": 1
+      },
+      {
+        "player_id": "SHF-02",
+        "name": "Goran Yardley",
+        "position": "RB",
+        "number": 2
+      },
+      {
+        "player_id": "SHF-05",
+        "name": "Umar Garrow",
+        "position": "CB",
+        "number": 5
+      },
+      {
+        "player_id": "SHF-04",
+        "name": "Bram Garrow",
+        "position": "CB",
+        "number": 4
+      },
+      {
+        "player_id": "SHF-03",
+        "name": "Omar Marlow",
+        "position": "LB",
+        "number": 3
+      },
+      {
+        "player_id": "SHF-06",
+        "name": "Luca Jessop",
+        "position": "CM",
+        "number": 6
+      },
+      {
+        "player_id": "SHF-08",
+        "name": "Idris Okafor",
+        "position": "CM",
+        "number": 8
+      },
+      {
+        "player_id": "SHF-10",
+        "name": "Tomas Norcross",
+        "position": "CM",
+        "number": 10
+      },
+      {
+        "player_id": "SHF-07",
+        "name": "Jonas Stroud",
+        "position": "RW",
+        "number": 7
+      },
+      {
+        "player_id": "SHF-09",
+        "name": "Dario Ashby",
+        "position": "ST",
+        "number": 9
+      },
+      {
+        "player_id": "SHF-11",
+        "name": "Pavel Garrow",
+        "position": "LW",
+        "number": 11
+      }
+    ]
+  },
+  "away": {
+    "code": "BRT",
+    "name": "Brackenridge Town",
+    "city": "Brackenridge",
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "BRT-01",
+        "name": "Pavel Zeller",
+        "position": "GK",
+        "number": 1
+      },
+      {
+        "player_id": "BRT-02",
+        "name": "Caio Okafor",
+        "position": "RB",
+        "number": 2
+      },
+      {
+        "player_id": "BRT-05",
+        "name": "Rafa Varga",
+        "position": "CB",
+        "number": 5
+      },
+      {
+        "player_id": "BRT-04",
+        "name": "Mateo Varga",
+        "position": "CB",
+        "number": 4
+      },
+      {
+        "player_id": "BRT-03",
+        "name": "Luca Brennick",
+        "position": "LB",
+        "number": 3
+      },
+      {
+        "player_id": "BRT-06",
+        "name": "Dario Varga",
+        "position": "CM",
+        "number": 6
+      },
+      {
+        "player_id": "BRT-08",
+        "name": "Zane Eldridge",
+        "position": "CM",
+        "number": 8
+      },
+      {
+        "player_id": "BRT-10",
+        "name": "Jonas Brennick",
+        "position": "CM",
+        "number": 10
+      },
+      {
+        "player_id": "BRT-07",
+        "name": "Farid Jessop",
+        "position": "RW",
+        "number": 7
+      },
+      {
+        "player_id": "BRT-09",
+        "name": "Jonas Fenwick",
+        "position": "ST",
+        "number": 9
+      },
+      {
+        "player_id": "BRT-11",
+        "name": "Tomas Thackeray",
+        "position": "LW",
+        "number": 11
+      }
+    ]
+  },
+  "final_score": {
+    "home": 3,
+    "away": 1
+  },
+  "synthetic": true
+}

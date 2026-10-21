@@ -1,0 +1,21 @@
+# secrets / local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.azure/
+# python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+# misc
+.DS_Store
+*.log

@@ -1,0 +1,164 @@
+{
+  "match_id": "EP-2026-003",
+  "competition": "Echo Pitch Synthetic League (fictional)",
+  "venue": "Lantern Lane",
+  "kickoff": "2026-10-27T15:00:00Z",
+  "pitch": {
+    "length_m": 105.0,
+    "width_m": 68.0,
+    "orientation": "home attacks towards x=105, away towards x=0, both halves"
+  },
+  "home": {
+    "code": "KNG",
+    "name": "Kingsfold United",
+    "city": "Kingsfold",
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "KNG-01",
+        "name": "Omar Okafor",
+        "position": "GK",
+        "number": 1
+      },
+      {
+        "player_id": "KNG-02",
+        "name": "Jonas Iversen",
+        "position": "RB",
+        "number": 2
+      },
+      {
+        "player_id": "KNG-05",
+        "name": "Pavel Varga",
+        "position": "CB",
+        "number": 5
+      },
+      {
+        "player_id": "KNG-04",
+        "name": "Caio Marlow",
+        "position": "CB",
+        "number": 4
+      },
+      {
+        "player_id": "KNG-03",
+        "name": "Yusuf Calloway",
+        "position": "LB",
+        "number": 3
+      },
+      {
+        "player_id": "KNG-06",
+        "name": "Caio Varga",
+        "position": "CM",
+        "number": 6
+      },
+      {
+        "player_id": "KNG-08",
+        "name": "Goran Jessop",
+        "position": "CM",
+        "number": 8
+      },
+      {
+        "player_id": "KNG-10",
+        "name": "Caio Underhill",
+        "position": "CM",
+        "number": 10
+      },
+      {
+        "player_id": "KNG-07",
+        "name": "Jonas Yardley",
+        "position": "RW",
+        "number": 7
+      },
+      {
+        "player_id": "KNG-09",
+        "name": "Tomas Brennick",
+        "position": "ST",
+        "number": 9
+      },
+      {
+        "player_id": "KNG-11",
+        "name": "Hugo Varga",
+        "position": "LW",
+        "number": 11
+      }
+    ]
+  },
+  "away": {
+    "code": "WYE",
+    "name": "Wyecliffe City",
+    "city": "Wyecliffe",
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "WYE-01",
+        "name": "Emil Kettering",
+        "position": "GK",
+        "number": 1
+      },
+      {
+        "player_id": "WYE-02",
+        "name": "Hugo Iversen",
+        "position": "RB",
+        "number": 2
+      },
+      {
+        "player_id": "WYE-05",
+        "name": "Tomas Varga",
+        "position": "CB",
+        "number": 5
+      },
+      {
+        "player_id": "WYE-04",
+        "name": "Ari Brennick",
+        "position": "CB",
+        "number": 4
+      },
+      {
+        "player_id": "WYE-03",
+        "name": "Tomas Whitlock",
+        "position": "LB",
+        "number": 3
+      },
+      {
+        "player_id": "WYE-06",
+        "name": "Farid Holloway",
+        "position": "CM",
+        "number": 6
+      },
+      {
+        "player_id": "WYE-08",
+        "name": "Zane Thackeray",
+        "position": "CM",
+        "number": 8
+      },
+      {
+        "player_id": "WYE-10",
+        "name": "Rafa Norcross",
+        "position": "CM",
+        "number": 10
+      },
+      {
+        "player_id": "WYE-07",
+        "name": "Nils Underhill",
+        "position": "RW",
+        "number": 7
+      },
+      {
+        "player_id": "WYE-09",
+        "name": "Luca Pellham",
+        "position": "ST",
+        "number": 9
+      },
+      {
+        "player_id": "WYE-11",
+        "name": "Wes Garrow",
+        "position": "LW",
+        "number": 11
+      }
+    ]
+  },
+  "final_score": {
+    "home": 1,
+    "away": 2
+  },
+  "synthetic": true
+}

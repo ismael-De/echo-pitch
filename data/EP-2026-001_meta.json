@@ -1,0 +1,164 @@
+{
+  "match_id": "EP-2026-001",
+  "competition": "Echo Pitch Synthetic League (fictional)",
+  "venue": "Harrowgate Park",
+  "kickoff": "2026-10-25T15:00:00Z",
+  "pitch": {
+    "length_m": 105.0,
+    "width_m": 68.0,
+    "orientation": "home attacks towards x=105, away towards x=0, both halves"
+  },
+  "home": {
+    "code": "AVR",
+    "name": "Avonmere Rovers",
+    "city": "Avonmere",
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "AVR-01",
+        "name": "Tomas Garrow",
+        "position": "GK",
+        "number": 1
+      },
+      {
+        "player_id": "AVR-02",
+        "name": "Omar Quarry",
+        "position": "RB",
+        "number": 2
+      },
+      {
+        "player_id": "AVR-05",
+        "name": "Wes Pellham",
+        "position": "CB",
+        "number": 5
+      },
+      {
+        "player_id": "AVR-04",
+        "name": "Wes Quarry",
+        "position": "CB",
+        "number": 4
+      },
+      {
+        "player_id": "AVR-03",
+        "name": "Luca Yardley",
+        "position": "LB",
+        "number": 3
+      },
+      {
+        "player_id": "AVR-06",
+        "name": "Omar Yardley",
+        "position": "CM",
+        "number": 6
+      },
+      {
+        "player_id": "AVR-08",
+        "name": "Ari Brennick",
+        "position": "CM",
+        "number": 8
+      },
+      {
+        "player_id": "AVR-10",
+        "name": "Farid Lindqvist",
+        "position": "CM",
+        "number": 10
+      },
+      {
+        "player_id": "AVR-07",
+        "name": "Yusuf Eldridge",
+        "position": "RW",
+        "number": 7
+      },
+      {
+        "player_id": "AVR-09",
+        "name": "Idris Yardley",
+        "position": "ST",
+        "number": 9
+      },
+      {
+        "player_id": "AVR-11",
+        "name": "Bram Fenwick",
+        "position": "LW",
+        "number": 11
+      }
+    ]
+  },
+  "away": {
+    "code": "CLW",
+    "name": "Coldwater Athletic",
+    "city": "Coldwater",
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "CLW-01",
+        "name": "Bram Lindqvist",
+        "position": "GK",
+        "number": 1
+      },
+      {
+        "player_id": "CLW-02",
+        "name": "Hugo Okafor",
+        "position": "RB",
+        "number": 2
+      },
+      {
+        "player_id": "CLW-05",
+        "name": "Goran Holloway",
+        "position": "CB",
+        "number": 5
+      },
+      {
+        "player_id": "CLW-04",
+        "name": "Emil Eldridge",
+        "position": "CB",
+        "number": 4
+      },
+      {
+        "player_id": "CLW-03",
+        "name": "Luca Quarry",
+        "position": "LB",
+        "number": 3
+      },
+      {
+        "player_id": "CLW-06",
+        "name": "Zane Underhill",
+        "position": "CM",
+        "number": 6
+      },
+      {
+        "player_id": "CLW-08",
+        "name": "Kofi Quarry",
+        "position": "CM",
+        "number": 8
+      },
+      {
+        "player_id": "CLW-10",
+        "name": "Viktor Marlow",
+        "position": "CM",
+        "number": 10
+      },
+      {
+        "player_id": "CLW-07",
+        "name": "Bram Kettering",
+        "position": "RW",
+        "number": 7
+      },
+      {
+        "player_id": "CLW-09",
+        "name": "Idris Eldridge",
+        "position": "ST",
+        "number": 9
+      },
+      {
+        "player_id": "CLW-11",
+        "name": "Caio Varga",
+        "position": "LW",
+        "number": 11
+      }
+    ]
+  },
+  "final_score": {
+    "home": 1,
+    "away": 1
+  },
+  "synthetic": true
+}

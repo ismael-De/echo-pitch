@@ -1,0 +1,848 @@
+{
+ "match": "EP-2026-002",
+ "speed": 60.0,
+ "runs": [
+  {
+   "summary": {
+    "lang": "en",
+    "persona": "fan",
+    "wall_s": 99.1,
+    "event_lag_s": {
+     "p50": -0.0,
+     "p95": 0.01,
+     "max": 1.01
+    },
+    "llm_latency_ms": {
+     "p50": 2768.0,
+     "p95": 3937.3,
+     "n": 34
+    },
+    "upgrade_delay_s": {
+     "p50": 2.86,
+     "max": 6.57
+    },
+    "trace_status": {
+     "ok": 43
+    },
+    "llm_calls": 35,
+    "tokens_in": 17089,
+    "tokens_out": 2706,
+    "cost_usd": 0.0097,
+    "recap_source": "llm",
+    "usage": {
+     "stats": {
+      "calls": 9,
+      "input_tokens": 7869,
+      "output_tokens": 787,
+      "reasoning_tokens": 0
+     },
+     "moments": {
+      "calls": 12,
+      "input_tokens": 4262,
+      "output_tokens": 991,
+      "reasoning_tokens": 0
+     },
+     "narrator": {
+      "calls": 13,
+      "input_tokens": 4084,
+      "output_tokens": 757,
+      "reasoning_tokens": 0
+     },
+     "persona": {
+      "calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0
+     },
+     "recap": {
+      "calls": 1,
+      "input_tokens": 874,
+      "output_tokens": 171,
+      "reasoning_tokens": 0
+     }
+    }
+   },
+   "upgrades": [
+    {
+     "kind": "commentary",
+     "delay_s": 2.6,
+     "template": "Good effort from Omar Marlow, held by the keeper.",
+     "llm": "What a moment! Omar Marlow forces a stunning low save from 6m — xG 0.54 — Saltmarsh FC rattled the bar of Brackenridge Town's defence.",
+     "clock": "2'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.96,
+     "title": "KEY SAVE",
+     "clock": "2'",
+     "template": "Pavel Zeller kept out a 0.54 xG chance, worth roughly 54% of a goal to Saltmarsh FC. Danger for Saltmarsh FC!",
+     "llm": "What a start — Pavel Zeller pulled off a massive early stop at 2', denying Saltmarsh FC a big chance and preventing a 0.54 xG opportunity that would have put us behind. It kept the score level during an even spell, preserving momentum and belief for Saltmarsh FC."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.89,
+     "template": "Brackenridge Town are on top right now with 58.3% of the ball.",
+     "llm": "Not to worry, Saltmarsh FC — despite Brackenridge Town controlling things with 56% possession, Saltmarsh already have the better chance on xG (0.54 vs 0.01), so a goal feel is in the air.",
+     "clock": "11'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 3.39,
+     "title": "PRESSING SURGE",
+     "clock": "15-20'",
+     "template": "Brackenridge Town turned up the press (50.8 vs a match average of 24.0). This period had 18 turnovers and the game felt chaotic.",
+     "llm": "This mattered because Brackenridge Town cranked up intense pressure early (pressing index 50.8 vs match average 24.0), forcing 18 turnovers in a chaotic 15–20' window and disrupting Saltmarsh FC's rhythm. That burst erased any control and left the game level at a tense turning point."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.61,
+     "template": "Brackenridge Town are on top right now with 54.7% of the ball.",
+     "llm": "Keep believing, Saltmarsh FC—despite Brackenridge Town leading the play and possession, Saltmarsh’s higher xG (0.54 vs 0.03) shows their one chance was far more dangerous.",
+     "clock": "21'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 3.73,
+     "title": "PRESSING SURGE",
+     "clock": "25-30'",
+     "template": "Brackenridge Town turned up the press (49.9 vs a match average of 27.2). This period had 19 turnovers and the game felt chaotic.",
+     "llm": "Brackenridge Town’s intense, chaotic pressure early in the half forced 19 turnovers in the window and drove the game to a level state, showing Saltmarsh FC were under heavy, sustained attack well above the match’s average pressing — a real test of our defensive composure."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.01,
+     "template": "Brackenridge Town are on top right now with 51.3% of the ball.",
+     "llm": "Keep the faith, Saltmarsh FC: despite 0–0, your team leads the danger with 0.61 xG to Brackenridge’s 0.08, so the better chances have come from Saltmarsh.",
+     "clock": "31'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.25,
+     "template": "Pavel Zeller flies across goal to keep it out! Incredible! Danger for Saltmarsh FC!",
+     "llm": "Oh wow — Pavel Zeller springs to his right to deny Jonas Stroud from 12 metres, a brilliant wonder-save keeps Saltmarsh FC at 0-0.",
+     "clock": "33'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.56,
+     "template": "Good effort from Jonas Stroud, held by the keeper.",
+     "llm": "Brilliant strike by Jonas Stroud from 12 metres at 33' — 91 km/h thunderbolt saved, Saltmarsh FC denied but the crowd roars with belief.",
+     "clock": "33'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.86,
+     "title": "KEY SAVE",
+     "clock": "33'",
+     "template": "Pavel Zeller kept out a 0.21 xG chance, worth roughly 21% of a goal to Saltmarsh FC. A world-class reflex save that protects the scoreline. Danger for Saltmarsh FC!",
+     "llm": "At 33' in an even spell, Pavel Zeller pulled off a world-class save to deny Saltmarsh FC and keep the score level, stopping a 0.209 xG chance. That stop prevented Saltmarsh from gaining the lead and preserved momentum for both teams heading into the middle of the half."
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.75,
+     "title": "KEY SAVE",
+     "clock": "33'",
+     "template": "Pavel Zeller kept out a 0.25 xG chance, worth roughly 25% of a goal to Saltmarsh FC. Uh-oh for Saltmarsh FC...",
+     "llm": "At 33', Brackenridge Town’s goalkeeper Pavel Zeller kept the score level with a strong save that denied Saltmarsh FC a good chance (xG 0.246). In an even spell, that stop preserved momentum for Saltmarsh and kept the match finely poised."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.28,
+     "template": "Luca Jessop tries his luck, but the keeper says no!",
+     "llm": "Jessop fires from 11 metres; a powerful 60 km/h effort denied—Saltmarsh FC agonisingly kept level at 0-0, nearly breaking the deadlock.",
+     "clock": "33'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.12,
+     "title": "PRESSING SURGE",
+     "clock": "30-35'",
+     "template": "Saltmarsh FC turned up the press (79.4 vs a match average of 33.2). This period had 19 turnovers and the game felt chaotic.",
+     "llm": "This burst matters because Saltmarsh FC cranked up intense pressing (pressing index 79.4 vs match average 33.2) in a chaotic phase, forcing 19 turnovers in that window and swinging control. With the score level around 30–35', that pressure created a real chance to seize momentum and unsettle Brackenridge Town."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.42,
+     "template": "Brackenridge Town are on top right now with 51.1% of the ball.",
+     "llm": "Hold tight, Saltmarsh FC — it's 0-0 but you’re dominating the danger with 1.07 xG to 0.08 despite slightly less possession.",
+     "clock": "41'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.34,
+     "template": "Half-time: SHF 0-0 BRT.",
+     "llm": "What a first half for Saltmarsh FC — 0-0 at the whistle but 1.07 xG shows we’ve bossed the chances; keep roaring, we deserve the breakthrough!",
+     "clock": "45+3'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.07,
+     "template": "Tomas Thackeray finds the net! What a moment for Brackenridge Town! SHF 0-1 BRT Danger for Saltmarsh FC!",
+     "llm": "Oh no! Tomas Thackeray pounces from 2 metres and buries it at 48'—Brackenridge Town lead 1-0, that 0.98 xG finish stings Saltmarsh FC.",
+     "clock": "48'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.86,
+     "title": "GOAL",
+     "clock": "48'",
+     "template": "Brackenridge Town take the lead. It changes the game state: Saltmarsh FC now have to open up. It came against the run of play: Saltmarsh FC had the momentum. A high-quality chance (0.98 xG) that Brackenridge Town had worked for. Uh-oh for Saltmarsh FC...",
+     "llm": "This matters because Brackenridge Town struck early in the second half, taking a 1-0 lead against the run of play and swinging momentum when Saltmarsh FC had been on top. The goal was high-quality (xG 0.98), so it’s a costly, clinical finish that puts Saltmarsh behind despite earlier pressure."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.75,
+     "template": "Saltmarsh FC are on top right now with 50.3% of the ball.",
+     "llm": "Keep believing, Saltmarsh FC — possession and shots are level but Saltmarsh’s slightly higher xG (1.07 vs 1.05) shows they’re edging chances to get back in this controlled phase.",
+     "clock": "51'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 1.85,
+     "template": "Luca Jessop lets fly... and it's wide.",
+     "llm": "57' — Luca Jessop lets fly from 12 metres, 0.16 xG but it flashes wide; Saltmarsh FC sighs as chance drifts past at 53 km/h.",
+     "clock": "57'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.95,
+     "title": "KEY SAVE",
+     "clock": "62'",
+     "template": "Pavel Zeller kept out a 0.27 xG chance, worth roughly 27% of a goal to Saltmarsh FC. Uh-oh for Saltmarsh FC...",
+     "llm": "That save matters because Saltmarsh FC were enjoying an even spell and could have equalised, but Pavel Zeller denied a 0.274 xG chance to keep Brackenridge Town narrowly ahead. It swings momentum and keeps Saltmarsh chasing late when they were pressing for a goal."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.26,
+     "template": "Saltmarsh FC are on top right now with 50.5% of the ball.",
+     "llm": "Saltmarsh FC are pushing now—despite trailing 0-1, they lead in possession (51%), shots (9) and xG (1.70), showing control and belief to turn the game around.",
+     "clock": "61'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.95,
+     "template": "Good effort from Tomas Norcross, held by the keeper.",
+     "llm": "Tomas Norcross rattles a fierce 9m shot at 80 km/h—saved brilliantly, but Saltmarsh FC smell the equaliser and roar on with belief.",
+     "clock": "62'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 1.84,
+     "template": "Farid Jessop lets fly... and it's wide.",
+     "llm": "Oh no — from 6 metres Farid Jessop lashes a 62 km/h effort off target for Brackenridge Town, Saltmarsh FC survive that nervy moment at 67'.",
+     "clock": "67'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.14,
+     "title": "BIG CHANCE",
+     "clock": "67'",
+     "template": "Farid Jessop should have scored: a 0.58 xG chance is converted roughly 58 times in 100. A huge let-off for Saltmarsh FC. Uh-oh for Saltmarsh FC...",
+     "llm": "This mattered because Brackenridge Town had a clear chance with an xG of 0.582 that could have doubled their lead in the 67th minute, but Farid Jessop missed it — a huge let-off for Saltmarsh FC. Coming against the run of play, it shifted momentum back to Saltmarsh and kept the game very much alive."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.18,
+     "template": "Saltmarsh FC are on top right now with 50.4% of the ball.",
+     "llm": "Saltmarsh FC have edged possession and more shots but Brackenridge Town look in control and slightly luckier on chances (xG 1.83 vs 1.72), so push for a decisive spell now.",
+     "clock": "71'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 1.89,
+     "template": "It's in! Idris Okafor sends the Saltmarsh FC fans wild! SHF 1-1 BRT Come on, Saltmarsh FC!",
+     "llm": "Idris Okafor smashes a stunning 28m strike at 85 km/h to rescue Saltmarsh FC — an unlikely 72' equaliser from just 0.02 xG!",
+     "clock": "72'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.28,
+     "title": "GOAL",
+     "clock": "72'",
+     "template": "An equaliser. Saltmarsh FC wipe out the deficit and the match is level again. It came against the run of play: Brackenridge Town had the momentum. A low-probability finish (0.02 xG): only about 2 in 100 such chances go in. Yes, Saltmarsh FC!",
+     "llm": "What a moment — Idris Okafor drags Saltmarsh FC back level in the 72' when we needed it most. Against the run of play and from a tiny chance (xG 0.018), this goal lifts the team and flips momentum back into our hands."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.94,
+     "template": "Brackenridge Town are on top right now with 50.5% of the ball.",
+     "llm": "We’re neck-and-neck at 1-1 with Saltmarsh FC pressing steadily—shots 12–11 and possession nearly even, but Brackenridge’s slightly higher xG (1.89) and cleaner passing warn it’s still anyone’s game.",
+     "clock": "81'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.0,
+     "template": "Pavel Garrow finds the net! What a moment for Saltmarsh FC! SHF 2-1 BRT Come on, Saltmarsh FC!",
+     "llm": "Garrow lashes it 8 metres out at 94 km/h — Saltmarsh FC take a thrilling 2-1 lead in the 86th minute, fans delirious!",
+     "clock": "86'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.81,
+     "title": "GOAL",
+     "clock": "86'",
+     "template": "Saltmarsh FC take the lead. It changes the game state: Brackenridge Town now have to open up. Coming in minute 86, there is little time to respond. A high-quality chance (0.44 xG) that Saltmarsh FC had worked for. Yes, Saltmarsh FC!",
+     "llm": "What a moment—Pavel Garrow's 86' goal puts Saltmarsh FC ahead 2-1, breaking an even spell late in the game. It was a high-quality chance (xG 0.441) that gives Saltmarsh the lead at a crucial time, shifting pressure onto Brackenridge Town."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 1.64,
+     "template": "It's in! Luca Jessop sends the Saltmarsh FC fans wild! SHF 3-1 BRT Come on, Saltmarsh FC!",
+     "llm": "Unbelievable — Luca Jessop buries an 8m finish at 90+1' (xG 0.41, 65 km/h) to seal Saltmarsh FC's 3-1 victory, pure jubilation!",
+     "clock": "90+1'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 6.44,
+     "title": "GOAL",
+     "clock": "90+1'",
+     "template": "Saltmarsh FC double down: a two-goal cushion makes a comeback much harder. Coming in minute 91, there is little time to respond. It capped a spell of sustained Saltmarsh FC pressure. A high-quality chance (0.41 xG) that Saltmarsh FC had worked for. Come on, Saltmarsh FC!",
+     "llm": "What a way to finish — in the 90+1' Luca Jessop buried a late goal to make it 3-1 and seal Saltmarsh FC's lead. Coming in with the run of play and worth a strong 0.409 xG, it turned pressure into a decisive, confidence-crushing finish."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 6.57,
+     "template": "Brackenridge Town are on top right now with 50.1% of the ball.",
+     "llm": "What a finish — Saltmarsh FC have controlled the closing minutes and their superior shot count and 2.74 xG underline deservedness of this 3-1 lead.",
+     "clock": "90+1'"
+    }
+   ],
+   "recap": {
+    "text": "Saltmarsh FC beat Brackenridge Town 3-1 at Estuary Stadium — a sweet win that felt deserved, with Saltmarsh edging the expected goals 2.74 to 1.89 and finishing with more shots (16-11) despite even possession. The decisive moments came early when Omar Marlow almost scored at 2' but Pavel Zeller kept Brackenridge alive with a stunning save, then Tomas Thackeray gave Brackenridge the lead at 48'. Saltmarsh turned it around after the break: Idris Okafor levelled at 72', Pavel Garrow put Saltmarsh ahead at 86', and Luca Jessop sealed it in stoppage time. Player of the match: Luca Jessop.",
+    "lang": "en",
+    "persona": "fan",
+    "source": "llm",
+    "score": {
+     "home": 3,
+     "away": 1
+    },
+    "xg": {
+     "home": 2.74,
+     "away": 1.89
+    },
+    "possession_pct": {
+     "home": 50.0,
+     "away": 50.0
+    },
+    "shots": {
+     "home": 16,
+     "away": 11
+    },
+    "player_of_match": {
+     "player_id": "SHF-06",
+     "player": "Luca Jessop",
+     "team": "Saltmarsh FC",
+     "score": 5.48
+    },
+    "moments": [
+     {
+      "clock": "2'",
+      "kind": "key_save",
+      "title": "KEY SAVE",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "15-20'",
+      "kind": "pressure_spike",
+      "title": "PRESSING SURGE",
+      "player": null,
+      "team": "away"
+     },
+     {
+      "clock": "25-30'",
+      "kind": "pressure_spike",
+      "title": "PRESSING SURGE",
+      "player": null,
+      "team": "away"
+     },
+     {
+      "clock": "33'",
+      "kind": "key_save",
+      "title": "KEY SAVE",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "33'",
+      "kind": "key_save",
+      "title": "KEY SAVE",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "30-35'",
+      "kind": "pressure_spike",
+      "title": "PRESSING SURGE",
+      "player": null,
+      "team": "home"
+     },
+     {
+      "clock": "48'",
+      "kind": "goal",
+      "title": "GOAL",
+      "player": "Tomas Thackeray",
+      "team": "away"
+     },
+     {
+      "clock": "62'",
+      "kind": "key_save",
+      "title": "KEY SAVE",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "67'",
+      "kind": "big_chance_missed",
+      "title": "BIG CHANCE",
+      "player": "Farid Jessop",
+      "team": "away"
+     },
+     {
+      "clock": "72'",
+      "kind": "goal",
+      "title": "GOAL",
+      "player": "Idris Okafor",
+      "team": "home"
+     },
+     {
+      "clock": "86'",
+      "kind": "goal",
+      "title": "GOAL",
+      "player": "Pavel Garrow",
+      "team": "home"
+     },
+     {
+      "clock": "90+1'",
+      "kind": "goal",
+      "title": "GOAL",
+      "player": "Luca Jessop",
+      "team": "home"
+     }
+    ]
+   },
+   "failures": []
+  },
+  {
+   "summary": {
+    "lang": "ar",
+    "persona": "analyst",
+    "wall_s": 99.0,
+    "event_lag_s": {
+     "p50": -0.01,
+     "p95": 0.0,
+     "max": 1.0
+    },
+    "llm_latency_ms": {
+     "p50": 2678.2,
+     "p95": 4315.2,
+     "n": 34
+    },
+    "upgrade_delay_s": {
+     "p50": 2.68,
+     "max": 6.46
+    },
+    "trace_status": {
+     "ok": 43
+    },
+    "llm_calls": 35,
+    "tokens_in": 16986,
+    "tokens_out": 3252,
+    "cost_usd": 0.0108,
+    "recap_source": "llm",
+    "usage": {
+     "stats": {
+      "calls": 9,
+      "input_tokens": 7844,
+      "output_tokens": 982,
+      "reasoning_tokens": 0
+     },
+     "moments": {
+      "calls": 12,
+      "input_tokens": 4226,
+      "output_tokens": 1159,
+      "reasoning_tokens": 0
+     },
+     "narrator": {
+      "calls": 13,
+      "input_tokens": 4045,
+      "output_tokens": 886,
+      "reasoning_tokens": 0
+     },
+     "persona": {
+      "calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0
+     },
+     "recap": {
+      "calls": 1,
+      "input_tokens": 871,
+      "output_tokens": 225,
+      "reasoning_tokens": 0
+     }
+    }
+   },
+   "upgrades": [
+    {
+     "kind": "moment",
+     "delay_s": 2.79,
+     "title": "تصدٍّ حاسم",
+     "clock": "2'",
+     "template": "Pavel Zeller أبعد فرصة بقيمة 0.54 xG، أي ما يعادل نحو 54% من هدف لـSaltmarsh FC.",
+     "llm": "تصدي دقيق من Pavel Zeller في الدقيقة 2 منع فرصة عالية القيمة (xG 0.542) لـ Saltmarsh FC، فأبقى النتيجة متعادلة خلال فترة لعب متكافئة؛ التصدي خفف ضغط مبكر ومحروم الخصم من احتمال تقدم مبكر أثر على توازن التكتيك."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.86,
+     "template": "تسديدة على المرمى من Omar Marlow: 0.54 xG بسرعة 46 كم/س، وتم التصدي لها.",
+     "llm": "دقيقة 2: تسديدة من Omar Marlow (Saltmarsh FC) من مسافة 6m بسرعة 46km/h بـxG 0.54 تُصدها حارس Brackenridge Town بدقة تكتيكية.",
+     "clock": "2'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.28,
+     "template": "لغة الأرقام 11': الاستحواذ 41.7%-58.3%، xG 0.54-0.01، التسديدات 1-1. طابع اللعب: متكافئاً.",
+     "llm": "برackenridge Town يهيمن على الاستحواذ (56%) ويضغط بمنهجية مضبوطة، لكن Saltmarsh FC أنتج فرصة أكثر جدية حسب xG (0.54 مقابل 0.01)، ما يشير إلى خطورة تناوب الهجمات رغم الفارق بالاستحواذ.",
+     "clock": "11'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.68,
+     "title": "موجة ضغط",
+     "clock": "15-20'",
+     "template": "Brackenridge Town رفع وتيرة الضغط (50.8 مقابل متوسط 24.0 في المباراة). وتبدّلت الحيازة 18 مرة في هذه الفترة، وكان طابع اللعب فوضوياً.",
+     "llm": "في الدقيقة 15–20، ضغوط Brackenridge Town ارتفعت بشكل ملحوظ مقارنة بالمعدل (50.8 مقابل 24.0)، ما خلق فترة فوضوية أدت إلى 18 فقدانًا للكرة في النافذة الزمنية، واستعادة كافية لإبقاء النتيجة متعادلة؛ هذا يبيّن تكثيف ضغط منظّم نسبياً أثّر مباشرة على استمرارية اللعب والانتقالات."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.33,
+     "template": "لغة الأرقام 21': الاستحواذ 45.3%-54.7%، xG 0.54-0.03، التسديدات 1-3. طابع اللعب: منظّماً.",
+     "llm": "عند الدقيقة 23، Brackenridge Town يهيمن على المباراة بتحكّم واضح (53.8% استحواذ) و3 تسديدات لكن xG منخفضة جداً (0.03)، بينما Saltmarsh FC رغم استحواذ أقل يملك xG أعلى (0.54).",
+     "clock": "21'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.64,
+     "title": "موجة ضغط",
+     "clock": "25-30'",
+     "template": "Brackenridge Town رفع وتيرة الضغط (49.9 مقابل متوسط 27.2 في المباراة). وتبدّلت الحيازة 19 مرة في هذه الفترة، وكان طابع اللعب فوضوياً.",
+     "llm": "في الدقيقة 25–30، Brackenridge Town ضاعفت ضغطها على Saltmarsh FC بمؤشر ضغط 49.9، أعلى بكثير من المتوسط 27.2، ما خلق فترة فوضوية أدت إلى 19 خسارة لاستحواذ خلال النافذة الزمنية؛ هذا تصعيد ضغطي حاسم أعاد المباراة إلى التعادل عبر إجبار الخصم على فقدان الكرة في مناطق خطرة."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.99,
+     "template": "لغة الأرقام 31': الاستحواذ 48.7%-51.3%، xG 0.54-0.08، التسديدات 1-4. طابع اللعب: متكافئاً.",
+     "llm": "على الرغم من تفوق Brackenridge Town الطفيف بالمُلكية (51.2%) وتمرّدت التمريرات (80.2% دقة)، فإن Saltmarsh FC أنتج فرصاً أوضح بأفضل xG (0.82 مقابل 0.08)، ما يشير إلى تفوّق تكتيكي في تهديد المرمى.",
+     "clock": "31'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.1,
+     "template": "تسديدة على المرمى من Jonas Stroud: 0.21 xG بسرعة 91 كم/س، وتم التصدي لها.",
+     "llm": "33' — Jonas Stroud يسدد من 12m بسرعة 91 km/h (xG 0.21) لكن تصدٍّ حاسم من Brackenridge Town يحفظ شباكهم.",
+     "clock": "33'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.42,
+     "title": "تصدٍّ حاسم",
+     "clock": "33'",
+     "template": "Pavel Zeller أبعد فرصة بقيمة 0.21 xG، أي ما يعادل نحو 21% من هدف لـSaltmarsh FC. تصدٍّ عالمي بردّة فعل خاطفة يحمي النتيجة.",
+     "llm": "تدخل حاسم في الدقيقة 33 ليحافظ على التعادل بعد فترة لعب متكافئة؛ تصدي Pavel Zeller لفرصة Saltmarsh FC بأهمية تكتيكية كبيرة لأنه منع هدفًا متوقعًا بقيمة 0.209 xG، تحويل زخم المباراة من احتمال تقدم الخصم إلى بقاء السيطرة متوازنة."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.6,
+     "template": "Pavel Zeller يحرم المنافس من 0.21 xG بردّة فعل سريعة.",
+     "llm": "عند الدقيقة 33، Pavel Zeller ينقذ فرصة رائعة من Jonas Stroud على بعد 12m؛ تصدٍ حاسم يقلّل xG المواجهة إلى 0.21 ويحافظ على 0-0.",
+     "clock": "33'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.38,
+     "template": "Luca Jessop يجبر الحارس على التصدي من 11 متر (xG 0.25).",
+     "llm": "33' — Luca Jessop (Saltmarsh FC) يسدد من 11m بسرعة 60km/h، تصدٍ مهم من Brackenridge Town؛ xG 0.25 يوضح فرصة متوسطة الخطورة.",
+     "clock": "33'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.75,
+     "title": "تصدٍّ حاسم",
+     "clock": "33'",
+     "template": "Pavel Zeller أبعد فرصة بقيمة 0.25 xG، أي ما يعادل نحو 25% من هدف لـSaltmarsh FC.",
+     "llm": "التصدي مهم لأنه أوقف محاولة عالية الجودة من Saltmarsh FC (xG 0.246) في الدقيقة 33، فحافظ Pavel Zeller على النتيجة متعادلة أثناء فترة متكافئة من اللعب؛ منحه ذلك السيطرة النفسية التكتيكية وأبعد خطر تقدم مبكر للضيوف."
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.4,
+     "title": "موجة ضغط",
+     "clock": "30-35'",
+     "template": "Saltmarsh FC رفع وتيرة الضغط (79.4 مقابل متوسط 33.2 في المباراة). وتبدّلت الحيازة 19 مرة في هذه الفترة، وكان طابع اللعب فوضوياً.",
+     "llm": "في الدقائق 30–35، ضغط Saltmarsh FC عالي جداً (Pressing index 79.4 vs مباراة معدل 33.2)، أجبر 19 تحويلة خلال نافذة زمنية قصيرة، ما حوّل فترة متوازنة إلى طور فوضوي و أعاد التوازن في النتيجة؛ هذا الاندفاع الضاغط خلق فقدان سيطرة متكرر لدى Brackenridge Town وزيادة الخطورة دون توزيع اللعب."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.82,
+     "template": "لغة الأرقام 41': الاستحواذ 48.9%-51.1%، xG 1.07-0.08، التسديدات 4-4. طابع اللعب: متكافئاً.",
+     "llm": "Saltmarsh FC يسيطر بلحظة حاسمة مع سيطرة الكرة متقاربة (49% مقابل 51%) لكن xG 1.07 مقابل 0.08 يبيّن تفوق Saltmarsh FC الهجومي النوعي.",
+     "clock": "41'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.34,
+     "template": "نهاية الشوط الأول: SHF 0-0 BRT. xG 1.07-0.08، الاستحواذ 49.5%-50.5%.",
+     "llm": "نهاية الشوط الأول عند 45+3' على نتيجة 0-0: Saltmarsh FC يتفوق في xG 1.07 مقابل 0.08 مع امتلاك متكافئ تقريبًا (49.5% مقابل 50.5%).",
+     "clock": "45+3'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.4,
+     "template": "Tomas Thackeray يسجّل من 2 متر (xG 0.98)، وسرعة التسديدة 78 كم/س. SHF 0-1 BRT",
+     "llm": "دقيقة 48، Tomas Thackeray يسجل لِـ Brackenridge Town ضد Saltmarsh FC من مسافة 2م؛ فرصة عالية القيمة (xG 0.98) وتسديدة بسرعة 78 كم/س.",
+     "clock": "48'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.52,
+     "title": "هدف",
+     "clock": "48'",
+     "template": "Brackenridge Town يتقدم في النتيجة، وهذا يغيّر مجرى اللقاء: على Saltmarsh FC الآن أن يهاجم. جاء عكس مجرى اللعب، فقد كانت الأفضلية لـSaltmarsh FC. فرصة عالية الجودة (0.98 xG) صنعها Brackenridge Town بجدارة.",
+     "llm": "هدف حاسم في الدقيقة 48 قلب سير المباراة: ضد مجريات اللعب، Tomas Thackeray سجل ليمنح Brackenridge Town التقدم 0-1. الجودة العالية للفرصة (xG 0.976) تشير إلى فرصة شبه مؤكدة تحولت إلى هدف، مما يزيد الضغط التكتيكي على Saltmarsh FC فوراً."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.03,
+     "template": "لغة الأرقام 51': الاستحواذ 50.3%-49.7%، xG 1.07-1.05، التسديدات 5-5. طابع اللعب: متكافئاً.",
+     "llm": "مع تساوي التسديدات وتفوق Saltmarsh FC الطفيف في الاستحواذ وBrackenridge Town بأفضلية 79.2% في دقة التمرير، التوازن يتحرك نحو Brackenridge تكتيكياً اعتماداً على تمريرات أكثر أماناً.",
+     "clock": "51'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.03,
+     "template": "Luca Jessop يخطئ المرمى من 12 متر (xG 0.16).",
+     "llm": "57' — Luca Jessop يسدد من 12 متراً بسرعة 53 كم/س ويخطئ المرمى؛ فرصة بقيمة xG 0.16 لم تترجم في Saltmarsh FC (0-1 Brackenridge Town).",
+     "clock": "57'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 3.61,
+     "template": "لغة الأرقام 61': الاستحواذ 50.5%-49.5%، xG 1.43-1.05، التسديدات 8-5. طابع اللعب: منظّماً.",
+     "llm": "مع وجود Saltmarsh FC في السيطرة عند الدقيقة 62 مع 51% استحواذ و1.70 xG مقابل 1.05، يظهر تفوقهم الهجومي رغم تأخرهم 0-1، استكمال الضغط مطلوب لتحويل الفرص لهدف.",
+     "clock": "61'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.95,
+     "template": "تسديدة على المرمى من Tomas Norcross: 0.27 xG بسرعة 80 كم/س، وتم التصدي لها.",
+     "llm": "62' — Tomas Norcross attempts a 9m, 80 km/h effort for Saltmarsh FC (xG 0.27) saved, Brackenridge Town preserves their 1-0 lead.",
+     "clock": "62'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 3.18,
+     "title": "تصدٍّ حاسم",
+     "clock": "62'",
+     "template": "Pavel Zeller أبعد فرصة بقيمة 0.27 xG، أي ما يعادل نحو 27% من هدف لـSaltmarsh FC.",
+     "llm": "في الدقيقة 62 قدم Pavel Zeller تصدياً حاسماً منع فرصة xG=0.274 لِSaltmarsh FC، محافظاً على تقدم Brackenridge Town بهدف واحد. التصدّي جاء خلال فترة متوازنة في اللعب، فحافظ على توازن المباراة ومنع تحول الضغط إلى تهديد فعلي على النتيجة."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 1.6,
+     "template": "Farid Jessop يخطئ المرمى من 6 متر (xG 0.58).",
+     "llm": "67' — Farid Jessop (Brackenridge Town) fires a 6m effort at 62 km/h that misses; high xG 0.58 suggests a clear chance squandered against Saltmarsh FC.",
+     "clock": "67'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.09,
+     "title": "فرصة ضائعة",
+     "clock": "67'",
+     "template": "كان على Farid Jessop أن يسجّل: فرصة بقيمة 0.58 xG تُترجم نحو 58 مرة من كل 100. نجاة كبيرة لـSaltmarsh FC.",
+     "llm": "في الدقيقة 67، Farid Jessop أهدر فرصة كبيرة بنتيجة xG = 0.582 بينما Brackenridge Town متقدمون بفارق هدف؛ الإضاعة جاءت ضد سير اللعب، ففشل تحويل هذه الفرصة يحافظ على سيطرة Saltmarsh FC المتصاعدة ويمنع توسيع الفارق في لحظة حرجة من المباراة."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 2.06,
+     "template": "هدف: Idris Okafor (Saltmarsh FC) يحوّل فرصة قيمتها 0.02 xG من 28 متر. SHF 1-1 BRT",
+     "llm": "72'—Idris Okafor يُسجل من مسافة 28 مترًا بقدرة تسديد 85 كم/س، هدف مفاجئ xG 0.02 يعادل تعديل النتيجة إلى Saltmarsh FC 1-1 ضد Brackenridge Town.",
+     "clock": "72'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.32,
+     "template": "لغة الأرقام 71': الاستحواذ 50.4%-49.6%، xG 1.72-1.69، التسديدات 10-8. طابع اللعب: منظّماً.",
+     "llm": "مع سيطرة Brackenridge Town وتمريرة ناجحة 79.8% مقابل 76.3%، التوازن ظاهريًا متكافئ (استحواذ 50.6%–49.4%) لكنxG أعلى قليلًا لـBrackenridge (1.83) مما يمنحهم الأفضلية التكتيكية.",
+     "clock": "71'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.59,
+     "title": "هدف",
+     "clock": "72'",
+     "template": "هدف التعادل! Saltmarsh FC يمحو التأخر وتعود المباراة إلى نقطة البداية. جاء عكس مجرى اللعب، فقد كانت الأفضلية لـBrackenridge Town. إنهاء صعب (0.02 xG): نحو 2 فقط من كل 100 فرصة مشابهة تدخل المرمى.",
+     "llm": "التعادل جاء في الدقيقة 72 عبر Idris Okafor ضد مجرى اللعب، فاصل مهم لأنه ألغى تأخر Saltmarsh FC وعاد بالتوازن في وقت متأخر من الشوط الثاني؛ فرصته كانت منخفضة الاحتمال (xG 0.018)، ما يبرز قيمة التنفيذ والتوقيت أكثر من جودة الفرصة."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 4.1,
+     "template": "لغة الأرقام 81': الاستحواذ 49.5%-50.5%، xG 1.74-1.89، التسديدات 11-11. طابع اللعب: منظّماً.",
+     "llm": "عادلان في النتيجة عند 1-1 لكن Brackenridge Town يتفوّق طفيفاً من حيث الاستحواذ (50.8%) ودقة التمرير (79.7%) مع xG أعلى قليلاً (1.89)، ما يشير إلى أفضلية تكتيكية صغيرة.",
+     "clock": "81'"
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 1.6,
+     "template": "هدف: Pavel Garrow (Saltmarsh FC) يحوّل فرصة قيمتها 0.44 xG من 8 متر. SHF 2-1 BRT",
+     "llm": "86' — Pavel Garrow يُسجل هدفاً حاسمًا من مسافة 8 متر بسرعة تسديدة 94 كم/س وxG 0.44 ليمنح Saltmarsh FC التقدم 2-1 على Brackenridge Town",
+     "clock": "86'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 2.8,
+     "title": "هدف",
+     "clock": "86'",
+     "template": "Saltmarsh FC يتقدم في النتيجة، وهذا يغيّر مجرى اللقاء: على Brackenridge Town الآن أن يهاجم. جاء في الدقيقة 86، ولم يتبقَّ وقت كبير للرد. فرصة عالية الجودة (0.44 xG) صنعها Saltmarsh FC بجدارة.",
+     "llm": "هدف في الدقيقة 86 قلب ميزان المباراة بتقدم Saltmarsh FC 2-1، بعد فترة لعب متساوية؛ فرصة ذات جودة متوسطة (xG 0.441) ما يشير إلى تسديدة وُجدت فيها احتمال حقيقي للتسجيل، فزاد الضغط التكتيكي على Brackenridge Town في الدقائق الحاسمة."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 1.88,
+     "template": "هدف: Luca Jessop (Saltmarsh FC) يحوّل فرصة قيمتها 0.41 xG من 8 متر. SHF 3-1 BRT",
+     "llm": "90+1' — Luca Jessop يهز الشباك من مسافة 8m بقوة 65km/h، هدف محسوب xG 0.41 يؤكد تقدم Saltmarsh FC 3-1 على Brackenridge Town.",
+     "clock": "90+1'"
+    },
+    {
+     "kind": "moment",
+     "delay_s": 6.38,
+     "title": "هدف",
+     "clock": "90+1'",
+     "template": "Saltmarsh FC يضاعف تقدمه، وفارق الهدفين يجعل العودة أصعب بكثير. جاء في الدقيقة 91، ولم يتبقَّ وقت كبير للرد. جاء تتويجاً لفترة ضغط متواصل من Saltmarsh FC. فرصة عالية الجودة (0.41 xG) صنعها Saltmarsh FC بجدارة.",
+     "llm": "هذا الهدف في الدقيقة 90+1 جعل Saltmarsh FC تتقدم بفارق هدفين (3-1) ويأتي بعد جريان اللعب لصالحهم، وهو فرصة ذات جودة عالية (xG 0.409)، فحوّل ضغط الاستحواذ والتحرك الأخير إلى نتيجة حاسمة قلصت أي احتمال لعودة Brackenridge Town."
+    },
+    {
+     "kind": "commentary",
+     "delay_s": 6.46,
+     "template": "لغة الأرقام 90+1': الاستحواذ 49.9%-50.1%، xG 2.33-1.89، التسديدات 15-11. طابع اللعب: متكافئاً.",
+     "llm": "مع انتهاء الوقت، Saltmarsh FC يسيطر بصورة متحكم بها مع أهم مؤشر xG 2.74 مقابل 1.89 لصالحه، رغم امتلاك Brackenridge Town نسبة تمرير أعلى و50.2% من الكرة.",
+     "clock": "90+1'"
+    }
+   ],
+   "recap": {
+    "text": "Saltmarsh FC فاز 3-1 على Brackenridge Town في Estuary Stadium. النتيجة كانت متقاربة مع تفوق بسيط لـ Saltmarsh على xG (2.74 مقابل 1.89)، ما يشير إلى فاعلية هجومية أعلى وتوزيع فرص أفضل. الحظقات الحاسمة جاءت بترتيب: تصدي مبكر كبير من Pavel Zeller لإنقاذ فرصة Omar Marlow (2') ثم سلسلة تصديات مهمة من Zeller (33' و33' و62') قبل أن يفتتح Tomas Thackeray التسجيل لــ Brackenridge (48'); Saltmarsh رد عبر هدف منخفض الاحتمال من Idris Okafor (72') ثم أهداف Garrow (86') وLuca Jessop في الوقت بدل الضائع (90+1') حسمت المباراة. لاعب اللقاء: Luca Jessop لــ Saltmarsh FC، إذ منح الفريق الهدف الحاسم وأنهى اللقاء بأثر واضح على النتيجة.",
+    "lang": "ar",
+    "persona": "analyst",
+    "source": "llm",
+    "score": {
+     "home": 3,
+     "away": 1
+    },
+    "xg": {
+     "home": 2.74,
+     "away": 1.89
+    },
+    "possession_pct": {
+     "home": 50.0,
+     "away": 50.0
+    },
+    "shots": {
+     "home": 16,
+     "away": 11
+    },
+    "player_of_match": {
+     "player_id": "SHF-06",
+     "player": "Luca Jessop",
+     "team": "Saltmarsh FC",
+     "score": 5.48
+    },
+    "moments": [
+     {
+      "clock": "2'",
+      "kind": "key_save",
+      "title": "تصدٍّ حاسم",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "15-20'",
+      "kind": "pressure_spike",
+      "title": "موجة ضغط",
+      "player": null,
+      "team": "away"
+     },
+     {
+      "clock": "25-30'",
+      "kind": "pressure_spike",
+      "title": "موجة ضغط",
+      "player": null,
+      "team": "away"
+     },
+     {
+      "clock": "33'",
+      "kind": "key_save",
+      "title": "تصدٍّ حاسم",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "33'",
+      "kind": "key_save",
+      "title": "تصدٍّ حاسم",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "30-35'",
+      "kind": "pressure_spike",
+      "title": "موجة ضغط",
+      "player": null,
+      "team": "home"
+     },
+     {
+      "clock": "48'",
+      "kind": "goal",
+      "title": "هدف",
+      "player": "Tomas Thackeray",
+      "team": "away"
+     },
+     {
+      "clock": "62'",
+      "kind": "key_save",
+      "title": "تصدٍّ حاسم",
+      "player": "Pavel Zeller",
+      "team": "away"
+     },
+     {
+      "clock": "67'",
+      "kind": "big_chance_missed",
+      "title": "فرصة ضائعة",
+      "player": "Farid Jessop",
+      "team": "away"
+     },
+     {
+      "clock": "72'",
+      "kind": "goal",
+      "title": "هدف",
+      "player": "Idris Okafor",
+      "team": "home"
+     },
+     {
+      "clock": "86'",
+      "kind": "goal",
+      "title": "هدف",
+      "player": "Pavel Garrow",
+      "team": "home"
+     },
+     {
+      "clock": "90+1'",
+      "kind": "goal",
+      "title": "هدف",
+      "player": "Luca Jessop",
+      "team": "home"
+     }
+    ]
+   },
+   "failures": []
+  }
+ ]
+}

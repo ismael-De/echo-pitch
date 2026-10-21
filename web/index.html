@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Echo Pitch · AI Match Storyteller</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">◉</span> ECHO <b>PITCH</b><span class="tag" data-i18n="tagline">AI match storyteller</span></div>
+  <div class="controls">
+    <label><span data-i18n="match">Match</span><select id="matchSel"></select></label>
+    <label><span data-i18n="speed">Speed</span><select id="speedSel"><option>10</option><option>20</option><option selected>30</option><option>45</option><option>60</option></select></label>
+    <div class="seg" id="personaSeg"><button data-v="fan" class="on" data-i18n="fan">Fan</button><button data-v="analyst" data-i18n="analyst">Analyst</button></div>
+    <div class="seg" id="langSeg"><button data-v="en" class="on">EN</button><button data-v="ar">عربي</button></div>
+    <label><span data-i18n="club">Club</span><select id="clubSel"><option value="" data-i18n="none">None</option></select></label>
+    <label><span data-i18n="player">Player</span><select id="playerSel"><option value="" data-i18n="none">None</option></select></label>
+    <button id="startBtn" class="primary" data-i18n="start">▶ Kick off</button>
+    <span id="modeBadge" class="badge">offline</span>
+  </div>
+</header>
+
+<section class="scoreboard">
+  <div class="team home"><span class="swatch"></span><span id="homeName">Home</span></div>
+  <div class="score"><span id="homeScore">0</span><span class="sep">–</span><span id="awayScore">0</span></div>
+  <div class="team away"><span id="awayName">Away</span><span class="swatch"></span></div>
+  <div class="clock" id="clock">0'</div>
+  <div class="chips"><span class="chip" id="phaseChip">—</span><span class="chip" id="rhythmChip">—</span></div>
+</section>
+
+<main class="grid">
+  <section class="left">
+    <div class="pitch-wrap" dir="ltr">
+      <svg id="pitch" viewBox="-2 -2 109 72" preserveAspectRatio="xMidYMid meet">
+        <rect x="0" y="0" width="105" height="68" class="turf"/>
+        <g class="stripes"></g>
+        <g class="lines">
+          <rect x="0" y="0" width="105" height="68"/>
+          <line x1="52.5" y1="0" x2="52.5" y2="68"/>
+          <circle cx="52.5" cy="34" r="9.15"/>
+          <circle cx="52.5" cy="34" r="0.4" class="dot"/>
+          <rect x="0" y="13.84" width="16.5" height="40.32"/><rect x="88.5" y="13.84" width="16.5" height="40.32"/>
+          <rect x="0" y="24.84" width="5.5" height="18.32"/><rect x="99.5" y="24.84" width="5.5" height="18.32"/>
+          <circle cx="11" cy="34" r="0.4" class="dot"/><circle cx="94" cy="34" r="0.4" class="dot"/>
+          <path d="M16.5,26.7 A9.15,9.15 0 0 1 16.5,41.3"/><path d="M88.5,26.7 A9.15,9.15 0 0 0 88.5,41.3"/>
+          <rect x="-1.5" y="30.34" width="1.5" height="7.32" class="goal"/><rect x="105" y="30.34" width="1.5" height="7.32" class="goal"/>
+        </g>
+        <g id="trails"></g><g id="dots"></g>
+      </svg>
+      <div id="overlays"></div>
+      <div class="attack-hint"><span class="h">→ <span id="hintHome"></span></span><span class="a"><span id="hintAway"></span> ←</span></div>
+    </div>
+    <div class="panel stats">
+      <div class="statrow"><span id="posH">50%</span><div class="bar"><i id="posBar"></i></div><span id="posA">50%</span><em data-i18n="possession">Possession</em></div>
+      <div class="kpis">
+        <div><b id="xgH">0.00</b><span>xG</span><b id="xgA">0.00</b></div>
+        <div><b id="shH">0</b><span data-i18n="shots">Shots</span><b id="shA">0</b></div>
+        <div><b id="sotH">0</b><span data-i18n="ontarget">On target</span><b id="sotA">0</b></div>
+        <div><b id="pcH">0%</b><span data-i18n="passes">Pass %</span><b id="pcA">0%</b></div>
+      </div>
+      <div class="momentum"><div class="mhead"><span data-i18n="momentum">Momentum</span><span id="momNow"></span></div>
+        <svg id="momChart" viewBox="0 0 400 80" preserveAspectRatio="none"><line x1="0" y1="40" x2="400" y2="40" class="axis"/><path id="momH"/><path id="momA"/><line id="htLine" x1="190" y1="0" x2="190" y2="80" class="ht"/></svg>
+      </div>
+    </div>
+  </section>
+  <section class="right">
+    <div class="panel feed"><h3 data-i18n="commentary">Live commentary</h3><ol id="ticker"></ol></div>
+    <div class="panel moments"><h3 data-i18n="moments">Key moments · why they matter</h3><div id="cards"></div></div>
+  </section>
+</main>
+
+<footer class="agents"><span class="lbl" data-i18n="agents">Agents</span>
+  <span class="agent" id="ag-stats">Stats</span><span class="arrow">→</span>
+  <span class="agent" id="ag-moments">Moments</span><span class="arrow">→</span>
+  <span class="agent" id="ag-narrator">Narrator</span><span class="arrow">→</span>
+  <span class="agent" id="ag-persona">Persona</span>
+  <div id="trace"></div>
+</footer>
+
+<div id="recap" class="modal hidden"><div class="modal-body">
+  <h2 data-i18n="fulltime">Full-time recap</h2>
+  <div class="recap-score" id="recapScore"></div>
+  <p id="recapText"></p>
+  <div id="recapMoments"></div>
+  <button class="primary" id="recapClose" data-i18n="close">Close</button>
+</div></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
