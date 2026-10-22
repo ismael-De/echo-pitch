@@ -51,3 +51,12 @@ def test_language_guard_rejects_wrong_language(text, lang):
 ])
 def test_language_guard_accepts_right_language(text, lang):
     check_language(text, lang)
+
+
+@pytest.mark.parametrize("lang", ("en", "ar") + NEW)
+def test_percentages_are_whole_numbers(match, lang):
+    import re
+    meta, ev = match
+    _, items = run(meta, ev, Prefs("analyst", lang))
+    texts = [c["text"] for c in of(items, "commentary")] + [of(items, "recap")[0]["text"]]
+    assert not any(re.search(r"\d+\.\d+ ?%", t) for t in texts)

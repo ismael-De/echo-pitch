@@ -423,8 +423,8 @@ class MatchOrchestrator:
         st = self._state_snapshot()
         h, a = self.meta["home"]["code"], self.meta["away"]["code"]
         vals = {"event_id": key, "clock": st["clock"], "score": f"{h} {st['score']['home']}-{st['score']['away']} {a}",
-                "xg_h": st["xg"]["home"], "xg_a": st["xg"]["away"], "pos_h": st["possession_pct"]["home"],
-                "pos_a": st["possession_pct"]["away"]}
+                "xg_h": st["xg"]["home"], "xg_a": st["xg"]["away"], "pos_h": round(st["possession_pct"]["home"]),
+                "pos_a": round(st["possession_pct"]["away"])}
         await self._comment(out, key, None, vals, important=True)
         out.append(("stats", self.compact_stats(st)))
         return out

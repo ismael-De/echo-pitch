@@ -71,8 +71,8 @@ class StatsAgent(Base):
         pos = st["possession_pct"]
         dom_side = "home" if pos["home"] >= pos["away"] else "away"
         cvc = st["control_vs_chaos"][-1]["label"] if st["control_vs_chaos"] else "contested"
-        vals = dict(clock=st["clock"], pos_h=pos["home"], pos_a=pos["away"], xg_h=st["xg"]["home"], xg_a=st["xg"]["away"],
-                    sh_h=st["shots"]["home"], sh_a=st["shots"]["away"], dom=st["teams"][dom_side], pos=pos[dom_side],
+        vals = dict(clock=st["clock"], pos_h=round(pos["home"]), pos_a=round(pos["away"]), xg_h=st["xg"]["home"], xg_a=st["xg"]["away"],
+                    sh_h=st["shots"]["home"], sh_a=st["shots"]["away"], dom=st["teams"][dom_side], pos=round(pos[dom_side]),
                     phase=T.MOMENTS[lang]["phase"][cvc])
         return T.pick(T.LINES[lang]["insight"][persona], st["clock"]).format(**vals)
 
@@ -189,7 +189,7 @@ class NarratorAgent(Base):
         goals = [m for m in st["key_moments"] if m["kind"] == "goal"]
         txt += R["goals"].format(goals=", ".join(f"{g['player']} {g['clock']}" for g in goals)) if goals else R["no_goals"]
         dom = "home" if pos["home"] >= pos["away"] else "away"
-        txt += R["control"].format(dom=meta[dom]["name"], pos=pos[dom], comp=st["passing"][dom]["completion_pct"])
+        txt += R["control"].format(dom=meta[dom]["name"], pos=round(pos[dom]), comp=round(st["passing"][dom]["completion_pct"]))
         saves = [m for m in st["key_moments"] if m["kind"] == "key_save"]
         if saves:
             s = max(saves, key=lambda m: m["xg_prevented"])
