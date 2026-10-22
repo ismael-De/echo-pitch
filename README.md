@@ -6,8 +6,24 @@
 > and your player.
 
 Built for the **Microsoft × Premier League "Inside the Game" Developer Hackathon**. It uses Microsoft Foundry
-and Microsoft Agent Framework, and is ready to deploy to Azure Container Apps.
+and Microsoft Agent Framework, and ships a ready-to-run Azure Container Apps deployment script.
 All clubs, players and data are **fictional and synthetic**.
+
+![Echo Pitch replay](docs/replay.gif)
+
+## Hackathon category
+
+**Primary: Multi-Agent.** Four specialist agents (Stats with function tools, Moments, Narrator, Persona) are
+coordinated by an orchestrator that shares match state, retries failed calls and falls back to deterministic
+templates, so the broadcast never stalls. **Also relevant: Foundry.** Every agent runs on a `gpt-5-mini`
+deployment in a Microsoft Foundry project, measured at about $0.01 per match per viewer (see below).
+
+| Judging criterion | Where to look |
+|---|---|
+| Technological implementation | synthetic generator (`generator/`), tests + CI, Foundry eval (`docs/foundry_eval.json`) |
+| Agentic design & innovation | [Architecture](#architecture), retry/fallback trace bar in the UI |
+| Real-world impact | per-viewer personalisation (Fan/Analyst, club, player) in English and Arabic |
+| UX & presentation | the replay UI below, demo video |
 
 ![Echo Pitch UI](docs/ui.png)
 
@@ -90,9 +106,9 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 
 | Technology | How |
 |---|---|
-| **Microsoft Foundry** | Model deployment (e.g. `gpt-4o-mini`) behind all four agents, via the Foundry project endpoint |
+| **Microsoft Foundry** | `gpt-5-mini` deployment behind all four agents (Narrator also writes the recap), via the Foundry project endpoint |
 | **Microsoft Agent Framework** | `Agent`, `FoundryChatClient`, Python function tools; multi-agent orchestration with handoffs |
-| **Azure Container Apps** | Hosting (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
+| **Azure Container Apps** | Deployment-ready, not yet deployed (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
 | **Azure Container Registry** | Cloud image build (`az acr build`) |
 | **GitHub Copilot** *(planned)* | Planned for upcoming development work; this row will be updated once it is used |
 | **GitHub Actions** | CI: tests, determinism check, Docker build and smoke test (`.github/workflows/ci.yml`) |
@@ -129,7 +145,7 @@ LLM_MODE=offline uvicorn app.main:app --port 8000    # Windows PowerShell: $env:
 az login
 export LLM_MODE=foundry
 export FOUNDRY_PROJECT_ENDPOINT=https://<account>.services.ai.azure.com/api/projects/<project>
-export FOUNDRY_MODEL=gpt-4o-mini
+export FOUNDRY_MODEL=gpt-5-mini
 uvicorn app.main:app --port 8000
 ```
 
