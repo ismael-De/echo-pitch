@@ -15,7 +15,7 @@ Echo Pitch ingests a live stream of synthetic match events and runs four special
 
 The agents share one match state, hand off to each other, retry failures and fall back to safe templates, so
 the broadcast never stalls. The output is timed, machine-readable overlay JSON plus a live web experience.
-It runs live on **Azure Container Apps** (https://echo-pitch.nicebeach-1b47021e.uaenorth.azurecontainerapps.io). The result is the same match
+It runs live on **Azure Container Apps** (https://echo-pitch-web.blackriver-a826d80e.uaenorth.azurecontainerapps.io). The result is the same match
 intelligence, made for every fan.
 
 ## What we built

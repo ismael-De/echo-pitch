@@ -9,7 +9,7 @@ Built for the **Microsoft × Premier League "Inside the Game" Developer Hackatho
 and Microsoft Agent Framework, and runs live on Azure Container Apps.
 All clubs, players and data are **fictional and synthetic**.
 
-**▶ Live demo: [echo-pitch.nicebeach-1b47021e.uaenorth.azurecontainerapps.io](https://echo-pitch.nicebeach-1b47021e.uaenorth.azurecontainerapps.io)** (Azure Container Apps, scales to zero, so the first load can take ~20 s).
+**▶ Live demo: [echo-pitch-web.blackriver-a826d80e.uaenorth.azurecontainerapps.io](https://echo-pitch-web.blackriver-a826d80e.uaenorth.azurecontainerapps.io)** (Azure Container Apps, scales to zero, so the first load can take ~20 s).
 
 ![Echo Pitch replay](docs/replay.gif)
 
@@ -110,7 +110,7 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 |---|---|
 | **Microsoft Foundry** | `gpt-5-mini` deployment behind all four agents (Narrator also writes the recap), via the Foundry project endpoint |
 | **Microsoft Agent Framework** | `Agent`, `FoundryChatClient`, Python function tools; multi-agent orchestration with handoffs |
-| **Azure Container Apps** | Live deployment (UAE North, 0.5 vCPU / 1 GiB, scale 0–1), keyless Foundry access via system-assigned managed identity with the `Cognitive Services User` role (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
+| **Azure Container Apps** | Live deployment (UAE North, 0.5 vCPU / 1 GiB, scale 0–1), keyless Foundry access and image pull via a user-assigned managed identity with the `Cognitive Services User` role (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
 | **Azure Container Registry** | Cloud image build (`az acr build`) |
 | **GitHub Copilot** *(planned)* | Planned for upcoming development work; this row will be updated once it is used |
 | **GitHub Actions** | CI: tests, determinism check, Docker build and smoke test (`.github/workflows/ci.yml`) |
