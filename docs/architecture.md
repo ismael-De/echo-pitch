@@ -100,7 +100,7 @@ safe template ─────────────────► status "fal
   - creates the resource group, ACR (cloud build, or a local docker/podman build with `LOCAL_BUILD` where ACR Tasks are blocked) and the Container Apps environment;
   - creates the app with a system-assigned identity, 0–1 replicas (scale to zero; one replica keeps in-memory replays and the spend guard consistent), 0.5 vCPU / 1 GiB and external ingress;
   - grants the *Cognitive Services User* role on the Foundry account (keyless auth via managed identity).
-- Live: UAE North, same region as the Foundry resource.
+- Live: UAE North, same region as the Foundry resource. Known limit: on an *express* Container Apps environment the platform rejects later `az containerapp update` calls while the app has a system-assigned identity, so a new image currently means recreating the app (or moving to a standard environment).
 - `.github/workflows/ci.yml`: pytest offline, a check that the data is deterministic, a Docker build and a smoke test.
 
 ## Limitations and next steps
