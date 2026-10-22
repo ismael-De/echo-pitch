@@ -177,3 +177,11 @@ SAFE = {"en": "{clock} {player} ({team}): {kind}.", "ar": "{clock} {player} ({te
 
 def pick(options: list[str], key: str) -> str:
     return options[zlib.crc32(key.encode()) % len(options)]
+
+# Spanish, French and Portuguese live in their own module to keep this file readable.
+from . import templates_intl as _intl  # noqa: E402
+
+for _name in ("LINES", "ZONES", "FAVOURITE", "MOMENTS", "RECAP", "TYPE_NAMES", "SAFE"):
+    globals()[_name].update(getattr(_intl, _name))
+
+LANGS = ("en", "ar", "es", "fr", "pt")

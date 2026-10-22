@@ -13,6 +13,7 @@ from typing import Any, Awaitable, Callable
 
 import analytics as A
 
+from . import templates as T
 from .config import Settings
 from .specialists import MomentsAgent, NarratorAgent, PersonaAgent, StatsAgent, dist_to_goal
 
@@ -28,7 +29,7 @@ class Prefs:
 
     def __post_init__(self):
         self.persona = self.persona if self.persona in ("fan", "analyst") else "fan"
-        self.lang = self.lang if self.lang in ("en", "ar") else "en"
+        self.lang = self.lang if self.lang in T.LANGS else "en"
         self.club = self.club if self.club in ("home", "away") else None
 
 
@@ -228,8 +229,7 @@ class MatchOrchestrator:
         side = e["team"]
         opp = "away" if side == "home" else "home"
         ax = e["x"] if side == "home" else 105 - e["x"]
-        zones = {"en": ("defensive third", "midfield", "final third"), "ar": ("الثلث الدفاعي", "وسط الملعب", "الثلث الأخير")}
-        zone = zones[self.prefs.lang][0 if ax < 35 else 1 if ax < 70 else 2]
+        zone = T.ZONES[self.prefs.lang][0 if ax < 35 else 1 if ax < 70 else 2]
         length = 0
         if e.get("end_x") is not None:
             length = round(((e["end_x"] - e["x"]) ** 2 + (e["end_y"] - e["y"]) ** 2) ** 0.5)

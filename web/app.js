@@ -15,6 +15,27 @@ const I18N = {
        potm:"أفضل لاعب", controlled:"منظّم", contested:"متكافئ", chaotic:"فوضوي", "fast and direct":"سريع ومباشر",
        "slow build-up":"بناء هادئ", steady:"متوازن", goal:"هدف!", xg:"xG", difficulty:"صعوبة التمريرة",
        speedAlert:"كم/س", attacks:"يهاجم"},
+  es: {tagline:"Narrador de partidos con IA", match:"Partido", speed:"Velocidad", fan:"Aficionado", analyst:"Analista",
+       club:"Club", player:"Jugador", none:"Ninguno", start:"▶ Empezar", restart:"↻ Reiniciar", possession:"Posesión",
+       shots:"Tiros", ontarget:"A puerta", passes:"% pases", momentum:"Impulso", commentary:"Comentario en directo",
+       moments:"Momentos clave · por qué importan", agents:"Agentes", fulltime:"Resumen final", close:"Cerrar",
+       potm:"Jugador del partido", controlled:"controlado", contested:"disputado", chaotic:"caótico",
+       "fast and direct":"rápido y directo", "slow build-up":"elaboración lenta", steady:"estable", goal:"¡GOL!",
+       xg:"xG", difficulty:"Dificultad del pase", speedAlert:"km/h", attacks:"ataca"},
+  fr: {tagline:"Le conteur de matchs IA", match:"Match", speed:"Vitesse", fan:"Supporter", analyst:"Analyste",
+       club:"Club", player:"Joueur", none:"Aucun", start:"▶ Coup d'envoi", restart:"↻ Rejouer", possession:"Possession",
+       shots:"Tirs", ontarget:"Cadrés", passes:"% passes", momentum:"Dynamique", commentary:"Commentaire en direct",
+       moments:"Moments clés · pourquoi ils comptent", agents:"Agents", fulltime:"Résumé du match", close:"Fermer",
+       potm:"Homme du match", controlled:"maîtrisé", contested:"disputé", chaotic:"décousu",
+       "fast and direct":"rapide et direct", "slow build-up":"construction lente", steady:"équilibré", goal:"BUT !",
+       xg:"xG", difficulty:"Difficulté de passe", speedAlert:"km/h", attacks:"attaque"},
+  pt: {tagline:"Narrador de jogos com IA", match:"Jogo", speed:"Velocidade", fan:"Torcedor", analyst:"Analista",
+       club:"Clube", player:"Jogador", none:"Nenhum", start:"▶ Começar", restart:"↻ Reiniciar", possession:"Posse",
+       shots:"Finalizações", ontarget:"No alvo", passes:"% passes", momentum:"Momento", commentary:"Narração ao vivo",
+       moments:"Lances decisivos · por que importam", agents:"Agentes", fulltime:"Resumo do jogo", close:"Fechar",
+       potm:"Craque do jogo", controlled:"controlado", contested:"disputado", chaotic:"caótico",
+       "fast and direct":"rápido e direto", "slow build-up":"construção lenta", steady:"estável", goal:"GOL!",
+       xg:"xG", difficulty:"Dificuldade do passe", speedAlert:"km/h", attacks:"ataca"},
 };
 const qs = new URLSearchParams(location.search);
 const S = {persona: qs.get("persona") || "fan", lang: qs.get("lang") || "en", club: qs.get("club") || "",
@@ -196,5 +217,8 @@ $("playerSel").onchange = () => { S.player = $("playerSel").value; reconnect(); 
 $("startBtn").onclick = () => start(0);
 $("recapClose").onclick = () => $("recap").classList.add("hidden");
 (() => { const g = document.querySelector(".stripes"); for (let i = 0; i < 105; i += 15) svg("rect", {x: i, y: 0, width: 7.5, height: 68}, g); })();
-seg("personaSeg", "persona"); seg("langSeg", "lang");
+seg("personaSeg", "persona");
+if (!I18N[S.lang]) S.lang = "en";
+$("langSel").value = S.lang;
+$("langSel").onchange = (e) => { S.lang = e.target.value; applyLang(); reconnect(); };
 loadMatches().then(() => { if (qs.get("autoplay")) start(); });

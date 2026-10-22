@@ -154,7 +154,7 @@ def config():
 @app.get("/api/replays/{rid}/stream")
 async def replay_stream(rid: str, stats_every: int = Query(25, ge=1, le=500),
                         persona: str = Query("fan", pattern="^(fan|analyst)$"),
-                        lang: str = Query("en", pattern="^(en|ar)$"),
+                        lang: str = Query("en", pattern="^(en|ar|es|fr|pt)$"),
                         club: str | None = Query(None, pattern="^(home|away)$"),
                         player: str | None = None, from_now: bool = False, agents: bool = True):
     """SSE stream for one viewer.

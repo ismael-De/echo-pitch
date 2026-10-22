@@ -26,6 +26,17 @@ AR_STYLE = (" Write the answer in Arabic, in the voice of a live Arab TV footbal
             "Do not translate English idioms word for word. Keep player and club names in Latin script, "
             "use Western digits for numbers and scores, and never mix English words into the Arabic text.")
 
+STYLE = {
+    "en": " Write the answer in English.",
+    "ar": AR_STYLE,
+    "es": (" Write the answer in Spanish, like a lively Spanish-language TV football commentator: natural, idiomatic "
+           "football Spanish (gol, disparo, parada, contraataque), no English words. Keep player and club names exactly as given."),
+    "fr": (" Write the answer in French, like a French TV football commentator: natural, idiomatic football French "
+           "(but, frappe, arrêt, contre-attaque), no English words. Keep player and club names exactly as given."),
+    "pt": (" Write the answer in Brazilian Portuguese, like a Brazilian TV football narrator: natural, idiomatic "
+           "(gol, chute, defesa, contra-ataque), no English words. Keep player and club names exactly as given."),
+}
+
 
 class Base:
     name = "base"
@@ -35,7 +46,7 @@ class Base:
 
     async def _llm(self, prompt: str, lang: str = "en", agent: Any | None = None) -> str:
         from .foundry import run_text
-        suffix = (AR_STYLE if lang == "ar" else " Write the answer in English.")
+        suffix = STYLE.get(lang, STYLE["en"])
         text = await run_text(agent or self.llm, prompt + suffix)
         check_language(text, lang)
         return text
@@ -231,15 +242,33 @@ class WrongLanguage(ValueError):
     pass
 
 
+_STOP = {
+    "en": {"the", "and", "with", "is", "his", "from", "after", "into", "their", "this", "for", "has", "was", "it's"},
+    "es": {"el", "los", "las", "del", "con", "una", "por", "pero", "y", "su", "es", "muy", "para", "está"},
+    "fr": {"le", "les", "des", "du", "avec", "une", "et", "est", "pour", "dans", "sur", "qui", "pas", "c'est"},
+    "pt": {"o", "os", "do", "da", "dos", "com", "uma", "e", "não", "para", "pelo", "na", "no", "está"},
+}
+
+
 def check_language(text: str, lang: str) -> None:
-    """Reject replies in the wrong language so the orchestrator retries (or keeps the template)."""
+    """Reject replies in the wrong language so the orchestrator retries (or keeps the template).
+
+    Arabic is checked by script share; Latin-script languages by distinctive function words
+    (player and club names are Latin in every language, so script alone cannot tell them apart)."""
     import re as _re
     arabic = len(_re.findall(r"[\u0600-\u06FF]", text))
-    letters = len(_re.findall(r"[A-Za-z\u0600-\u06FF]", text)) or 1
-    if lang == "ar" and arabic / letters < 0.4:
-        raise WrongLanguage("expected Arabic output")
-    if lang == "en" and arabic > 0:
-        raise WrongLanguage("expected English output")
+    letters = len(_re.findall(r"[A-Za-z\u00C0-\u00FF\u0600-\u06FF]", text)) or 1
+    if lang == "ar":
+        if arabic / letters < 0.4:
+            raise WrongLanguage("expected Arabic output")
+        return
+    if arabic > 0:
+        raise WrongLanguage(f"expected {lang} output, got Arabic script")
+    words = _re.findall(r"[a-zà-ÿ']+", text.lower())
+    score = {k: sum(w in v for w in words) for k, v in _STOP.items()}
+    best = max(score, key=lambda k: score[k])
+    if lang in score and best != lang and score[best] >= 2 and score[best] > score[lang]:
+        raise WrongLanguage(f"expected {lang} output, looks like {best}")
 
 
 def moment_facts(m: dict) -> dict:
