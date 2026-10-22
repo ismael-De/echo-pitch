@@ -96,3 +96,23 @@ def test_web_ui_served(client):
     assert "Echo Pitch" in html and "/static/app.js" in html
     assert client.get("/static/app.js").status_code == 200
     assert client.get("/api/config").json()["llm_mode"] in ("offline", "foundry")
+
+
+def test_budget_limits_and_release():
+    from app.budget import Budget
+    b = Budget()
+    b.per_ip_hour, b.per_day, b.max_concurrent = 2, 3, 2
+    assert b.acquire("a", 0)[0] and b.acquire("a", 1)[0]
+    assert b.acquire("b", 2) == (False, "too many live AI streams right now")
+    b.release(); b.release()
+    assert b.acquire("a", 3) == (False, "hourly AI limit for this viewer reached")
+    assert b.acquire("b", 4)[0]
+    b.release()
+    assert b.acquire("c", 5) == (False, "daily AI budget reached")
+    assert b.acquire("a", 3700 + 86400)[0]  # next day, hour window expired
+
+
+def test_client_id_prefers_forwarded_for():
+    from app.budget import client_id
+    assert client_id({"x-forwarded-for": "1.2.3.4, 10.0.0.1"}, "10.0.0.1") == "1.2.3.4"
+    assert client_id({}, "9.9.9.9") == "9.9.9.9"

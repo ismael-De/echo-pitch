@@ -6,7 +6,7 @@
 # Usage:
 #   export AZ_RG=echo-pitch-rg AZ_LOCATION=swedencentral AZ_ACR=echopitch$RANDOM
 #   export FOUNDRY_PROJECT_ENDPOINT=https://<account>.services.ai.azure.com/api/projects/<project>
-#   export FOUNDRY_MODEL=gpt-4o-mini
+#   export FOUNDRY_MODEL=gpt-5-mini
 #   export FOUNDRY_ACCOUNT_ID=/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.CognitiveServices/accounts/<account>
 #   ./infra/deploy_aca.sh
 set -euo pipefail
@@ -33,10 +33,12 @@ echo "==> Container app $APP (LLM_MODE=$MODE)"
 az containerapp create -g "$RG" -n "$APP" --environment "$ENV_NAME" \
   --image "$ACR.azurecr.io/echo-pitch:$TAG" --registry-server "$ACR.azurecr.io" --registry-identity system \
   --system-assigned --ingress external --target-port 8000 \
-  --min-replicas 1 --max-replicas 3 --cpu 1.0 --memory 2.0Gi \
+  --min-replicas 0 --max-replicas 1 --cpu 0.5 --memory 1.0Gi \
   --env-vars LLM_MODE="$MODE" FOUNDRY_PROJECT_ENDPOINT="${FOUNDRY_PROJECT_ENDPOINT:-}" \
-             FOUNDRY_MODEL="${FOUNDRY_MODEL:-gpt-4o-mini}" LLM_TIMEOUT_S=8 LLM_RETRIES=1 -o none
-# min-replicas 1 keeps in-memory replay sessions alive; SSE needs no special ingress settings.
+             FOUNDRY_MODEL="${FOUNDRY_MODEL:-gpt-5-mini}" LLM_TIMEOUT_S=8 LLM_RETRIES=1 FOUNDRY_CREDENTIAL=managed \
+             BUDGET_STREAMS_PER_IP_HOUR=6 BUDGET_STREAMS_PER_DAY=150 BUDGET_MAX_CONCURRENT=4 -o none
+# Cheapest: scale to zero when idle (first visit has a cold start) and a single replica, so the in-memory
+# replay sessions and the spend guard (app/budget.py) live in one process. SSE needs no special ingress settings.
 
 if [ "$MODE" = "foundry" ] && [ -n "${FOUNDRY_ACCOUNT_ID:-}" ]; then
   echo "==> Grant the app's managed identity access to Foundry (keyless auth via DefaultAzureCredential)"

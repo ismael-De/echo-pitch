@@ -3,7 +3,7 @@
 LLM_MODE                       offline | foundry  (default: foundry if an endpoint is set, else offline)
 FOUNDRY_PROJECT_ENDPOINT       https://<account>.services.ai.azure.com/api/projects/<project>
   (alias AZURE_AI_PROJECT_ENDPOINT)
-FOUNDRY_MODEL                  model deployment name, e.g. gpt-4o-mini
+FOUNDRY_MODEL                  model deployment name, e.g. gpt-5-mini
   (alias AZURE_AI_MODEL_DEPLOYMENT_NAME)
 LLM_TIMEOUT_S                  per-agent call timeout (default 20)
 LLM_MAX_COMPLETION_TOKENS      output-token cap per call (default 400; recap 500)
@@ -60,7 +60,7 @@ class Settings:
     def from_env(cls) -> "Settings":
         load_dotenv()
         ep = _env("FOUNDRY_PROJECT_ENDPOINT", "AZURE_AI_PROJECT_ENDPOINT")
-        model = _env("FOUNDRY_MODEL", "AZURE_AI_MODEL_DEPLOYMENT_NAME", default="gpt-4o-mini")
+        model = _env("FOUNDRY_MODEL", "AZURE_AI_MODEL_DEPLOYMENT_NAME", default="gpt-5-mini")
         mode = (_env("LLM_MODE", default="foundry" if ep else "offline") or "offline").lower()
         warning = None
         if mode == "foundry" and not ep:

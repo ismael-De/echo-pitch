@@ -12,12 +12,13 @@ import uuid
 from functools import lru_cache
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from agents import MatchOrchestrator, Prefs, Settings
+from app.budget import Budget, client_id
 from analytics import match_state
 from analytics.stats import _bucket as A_bucket
 
@@ -75,6 +76,7 @@ class Replay:
 
 
 REPLAYS: dict[str, Replay] = {}
+BUDGET = Budget()
 
 
 def _replay(rid: str) -> Replay:
@@ -123,6 +125,8 @@ def get_stats(match_id: str, upto: int | None = Query(None, ge=0, description="s
 @app.post("/api/replays", status_code=201)
 def create_replay(req: ReplayRequest):
     r = Replay(req.match_id, req.speed, req.start_minute)
+    while len(REPLAYS) >= BUDGET.max_replays:  # dicts keep insertion order: evict the oldest
+        REPLAYS.pop(next(iter(REPLAYS)))
     REPLAYS[r.id] = r
     return {"replay_id": r.id, "match_id": r.match_id, "speed": r.speed,
             "stream_url": f"/api/replays/{r.id}/stream", "state_url": f"/api/replays/{r.id}/state"}
@@ -152,7 +156,7 @@ def config():
 
 
 @app.get("/api/replays/{rid}/stream")
-async def replay_stream(rid: str, stats_every: int = Query(25, ge=1, le=500),
+async def replay_stream(request: Request, rid: str, stats_every: int = Query(25, ge=1, le=500),
                         persona: str = Query("fan", pattern="^(fan|analyst)$"),
                         lang: str = Query("en", pattern="^(en|ar|es|fr|pt)$"),
                         club: str | None = Query(None, pattern="^(home|away)$"),
@@ -164,10 +168,17 @@ async def replay_stream(rid: str, stats_every: int = Query(25, ge=1, le=500),
     at its current position (used when the viewer changes preferences mid-match).
     """
     r = _replay(rid)
+    settings = Settings.from_env()
+    held, limited = False, None
+    if agents and settings.mode == "foundry":
+        held, limited = BUDGET.acquire(client_id(request.headers, request.client.host if request.client else None))
+        if not held:
+            from dataclasses import replace
+            settings = replace(settings, mode="offline")
 
     async def gen():
         sent = r.position() if from_now else sum(1 for t in r.t if t < r.offset)
-        orch = MatchOrchestrator(r.meta, Prefs(persona, lang, club, player)) if agents else None
+        orch = MatchOrchestrator(r.meta, Prefs(persona, lang, club, player), settings) if agents else None
         if orch:
             for e in r.events[:sent]:  # warm the shared state silently when joining mid-match
                 orch.events.append(e)
@@ -209,7 +220,17 @@ async def replay_stream(rid: str, stats_every: int = Query(25, ge=1, le=500),
             yield _sse("usage", orch.usage())
         yield _sse("end", {"final_score": r.meta["final_score"]})
 
-    return StreamingResponse(gen(), media_type="text/event-stream",
+    async def guarded():
+        try:
+            if limited:
+                yield _sse("notice", {"llm": "offline", "reason": limited})
+            async for chunk in gen():
+                yield chunk
+        finally:
+            if held:
+                BUDGET.release()
+
+    return StreamingResponse(guarded(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
