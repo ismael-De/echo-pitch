@@ -79,7 +79,7 @@ function connect(fromNow) {
   const on = (name, fn) => es.addEventListener(name, (ev) => fn(JSON.parse(ev.data)));
   on("meta", (d) => { const b = $("modeBadge"); b.textContent = d.llm_mode === "foundry" ? "Azure AI Foundry" : "offline agents"; b.classList.toggle("foundry", d.llm_mode === "foundry"); });
   on("match_event", drawEvent); on("commentary", addLine); on("moment_card", addCard);
-  on("commentary_update", (u) => { const li = document.querySelector(`#ticker li[data-id="${u.id}"] .txt`); if (li) { li.textContent = u.text; li.nextSibling.textContent = u.source; } }); on("overlay", showOverlay);
+  on("commentary_update", (u) => { const li = document.querySelector(`#ticker li[data-id="${u.id}"] .txt`); if (li) { li.classList.add("swap"); setTimeout(() => { li.innerHTML = bidi(u.text); li.nextSibling.textContent = u.source; li.classList.remove("swap"); li.closest("li").classList.add("upgraded"); }, 220); } }); on("overlay", showOverlay);
   on("stats", updateStats); on("agent_trace", trace); on("recap", showRecap);
   on("end", () => es.close());
 }
@@ -110,7 +110,7 @@ function clockOf(e) { const m = e.minute; if (e.period === 1 && m >= 45) return 
 function addLine(d) {
   const li = document.createElement("li");
   li.className = `${d.team || ""} ${d.important ? "big" : ""}`; li.dataset.id = d.id || "";
-  li.innerHTML = `<span class="c">${d.clock}</span><span><span class="txt">${esc(d.text)}</span><span class="src">${d.source}</span></span>`;
+  li.innerHTML = `<span class="c">${d.clock}</span><span><span class="txt">${bidi(d.text)}</span><span class="src">${d.source}</span></span>`;
   $("ticker").prepend(li);
   while ($("ticker").children.length > 40) $("ticker").lastChild.remove();
 }
@@ -123,6 +123,7 @@ function addCard(c) {
     <div><b>${esc(c.player || "")}</b></div><p>${esc(c.why)}</p><div class="imp"><i style="width:${Math.round((c.importance || 0) * 100)}%"></i></div>`;
   if (!old) $("cards").prepend(div);
 }
+function bidi(s) { return esc(s).replace(/[A-Za-z0-9][A-Za-z0-9 .'\-]*[A-Za-z0-9]|[A-Za-z]/g, (m) => `<bdi>${m}</bdi>`); }
 function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c])); }
 
 // ---------------------------------------------------------------- overlays (timed, machine-readable cards)

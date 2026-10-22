@@ -20,6 +20,13 @@ def _audience(ctx: dict) -> str:
             f"Favourite player: {ctx.get('player_name') or 'none'}.")
 
 
+AR_STYLE = (" Write the answer in Arabic, in the voice of a live Arab TV football commentator "
+            "(think beIN Sports): fluent, modern standard Arabic that sounds spoken, short punchy sentences, "
+            "natural football vocabulary (e.g. هدف، تسديدة، تصدٍّ، هجمة مرتدة، الشباك، القائم). "
+            "Do not translate English idioms word for word. Keep player and club names in Latin script, "
+            "use Western digits for numbers and scores, and never mix English words into the Arabic text.")
+
+
 class Base:
     name = "base"
 
@@ -28,8 +35,7 @@ class Base:
 
     async def _llm(self, prompt: str, lang: str = "en", agent: Any | None = None) -> str:
         from .foundry import run_text
-        suffix = (" Write the answer in Modern Standard Arabic (names stay in Latin script)." if lang == "ar"
-                  else " Write the answer in English.")
+        suffix = (AR_STYLE if lang == "ar" else " Write the answer in English.")
         text = await run_text(agent or self.llm, prompt + suffix)
         check_language(text, lang)
         return text
