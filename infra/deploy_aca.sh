@@ -8,7 +8,7 @@
 #   export FOUNDRY_PROJECT_ENDPOINT=https://<account>.services.ai.azure.com/api/projects/<project>
 #   export FOUNDRY_MODEL=gpt-5-mini
 #   export FOUNDRY_ACCOUNT_ID=/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.CognitiveServices/accounts/<account>
-#   ./infra/deploy_aca.sh
+#   ./infra/deploy_aca.sh            # LOCAL_BUILD=docker|podman if ACR Tasks are blocked
 set -euo pipefail
 
 RG=${AZ_RG:-echo-pitch-rg}
@@ -23,8 +23,16 @@ echo "==> Resource group $RG ($LOC)"
 az group create -n "$RG" -l "$LOC" -o none
 
 echo "==> Container registry $ACR + cloud build"
-az acr create -g "$RG" -n "$ACR" --sku Basic -o none
-az acr build -r "$ACR" -t "echo-pitch:$TAG" .
+az acr show -n "$ACR" -o none 2>/dev/null || az acr create -g "$RG" -n "$ACR" --sku Basic -o none
+if [ -n "${LOCAL_BUILD:-}" ]; then
+  # Some subscriptions (e.g. Azure for Students) block ACR Tasks: build locally with docker/podman and push.
+  "$LOCAL_BUILD" build -t "$ACR.azurecr.io/echo-pitch:$TAG" .
+  az acr login -n "$ACR" --expose-token --query accessToken -o tsv |
+    "$LOCAL_BUILD" login "$ACR.azurecr.io" -u 00000000-0000-0000-0000-000000000000 --password-stdin
+  "$LOCAL_BUILD" push "$ACR.azurecr.io/echo-pitch:$TAG"
+else
+  az acr build -r "$ACR" -t "echo-pitch:$TAG" .
+fi
 
 echo "==> Container Apps environment $ENV_NAME"
 az containerapp env create -g "$RG" -n "$ENV_NAME" -l "$LOC" -o none
