@@ -2,12 +2,14 @@
 
 > **Every match, explained, for every fan.** Echo Pitch turns a live stream of synthetic football events into
 > explainable match intelligence: live commentary, "why it matters" moment cards, timed broadcast overlays and
-> a full-time recap. It is personalised for an analyst or a casual fan, in English or Arabic, around your club
+> a full-time recap. It is personalised for an analyst or a casual fan, in English, Arabic, Spanish, French or Portuguese, around your club
 > and your player.
 
 Built for the **Microsoft × Premier League "Inside the Game" Developer Hackathon**. It uses Microsoft Foundry
-and Microsoft Agent Framework, and ships a ready-to-run Azure Container Apps deployment script.
+and Microsoft Agent Framework, and runs live on Azure Container Apps.
 All clubs, players and data are **fictional and synthetic**.
+
+**▶ Live demo: [echo-pitch.nicebeach-1b47021e.uaenorth.azurecontainerapps.io](https://echo-pitch.nicebeach-1b47021e.uaenorth.azurecontainerapps.io)** (Azure Container Apps, scales to zero, so the first load can take ~20 s).
 
 ![Echo Pitch replay](docs/replay.gif)
 
@@ -22,7 +24,7 @@ deployment in a Microsoft Foundry project, measured at about $0.01 per match per
 |---|---|
 | Technological implementation | synthetic generator (`generator/`), tests + CI, Foundry eval (`docs/foundry_eval.json`) |
 | Agentic design & innovation | [Architecture](#architecture), retry/fallback trace bar in the UI |
-| Real-world impact | per-viewer personalisation (Fan/Analyst, club, player) in English and Arabic |
+| Real-world impact | per-viewer personalisation (Fan/Analyst, club, player) in English, Arabic, Spanish, French and Portuguese |
 | UX & presentation | the replay UI below, demo video |
 
 ![Echo Pitch UI](docs/ui.png)
@@ -42,7 +44,7 @@ languages, does not scale.
 | **2. Interpret** | stats, patterns, context | Deterministic analytics: possession, pass difficulty (0–100), xG timeline, pressing index, rolling momentum, key-moment candidates | `analytics/stats.py` |
 | **3. Explain** | *why* a moment matters | The **Moments agent** explains each moment through game state (lead, equaliser, cushion), timing, with or against the run of play, xG probability, *control vs chaos* and pressure shifts | `agents/` |
 | **4. Render** | on-screen, alongside the match | Timed, machine-readable **overlay cards** (`start_s`, `duration_s`, `anchor`, `payload`): goal banner, shot xG, pass difficulty, speed alert, player tag, stat bar, moment lower-third. A broadcast-style web UI renders them. | `agents/orchestrator.py`, `web/` |
-| **5. Personalise** | analyst vs fan, club, player, language | The **Persona agent** has Analyst and Fan modes, a favourite-club perspective, a favourite-player focus (★ tags on every touch) and EN/AR output with full RTL | `agents/specialists.py`, `web/app.js` |
+| **5. Personalise** | analyst vs fan, club, player, language | The **Persona agent** has Analyst and Fan modes, a favourite-club perspective, a favourite-player focus (★ tags on every touch) and EN/AR/ES/FR/PT output (full RTL for Arabic) | `agents/specialists.py`, `web/app.js` |
 
 It also covers the suggested features: player identification (name tags plus speed alerts above thresholds),
 pass quality (distance, accuracy, difficulty), ball and shot speed, narratives and recaps, explainability, data
@@ -60,7 +62,7 @@ flowchart LR
   subgraph O["Orchestrator (shared match state)"]
     direction LR
     S["Stats agent<br/>tools: analytics/*"] --> M["Moments agent<br/>why it matters"]
-    M --> N["Narrator agent<br/>commentary + recap EN/AR"]
+    M --> N["Narrator agent<br/>commentary + recap in 5 languages"]
     N --> P["Persona agent<br/>analyst/fan · club · player"]
   end
   O <-->|"async LLM calls"| F["Microsoft Foundry<br/>model deployment"]
@@ -92,7 +94,7 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
   Every agent reads from it, and the Stats tools query it live.
 - **Handoffs:** for each key moment the work passes Stats (context) → Moments (why) → Persona (audience) →
   render (card and overlay). Narrator → Persona handles commentary lines.
-- **Never blocks the broadcast:** every line and card is rendered immediately from deterministic EN/AR templates.
+- **Never blocks the broadcast:** every line and card is rendered immediately from deterministic templates in all five languages.
   When Foundry is configured, LLM calls run **concurrently in the background** and stream
   `commentary_update` and upgraded `moment_card` events as they finish, so slow model calls never make the
   replay lag.
@@ -108,10 +110,26 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 |---|---|
 | **Microsoft Foundry** | `gpt-5-mini` deployment behind all four agents (Narrator also writes the recap), via the Foundry project endpoint |
 | **Microsoft Agent Framework** | `Agent`, `FoundryChatClient`, Python function tools; multi-agent orchestration with handoffs |
-| **Azure Container Apps** | Deployment-ready, not yet deployed (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
+| **Azure Container Apps** | Live deployment (UAE North, 0.5 vCPU / 1 GiB, scale 0–1), keyless Foundry access via system-assigned managed identity with the `Cognitive Services User` role (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
 | **Azure Container Registry** | Cloud image build (`az acr build`) |
 | **GitHub Copilot** *(planned)* | Planned for upcoming development work; this row will be updated once it is used |
 | **GitHub Actions** | CI: tests, determinism check, Docker build and smoke test (`.github/workflows/ci.yml`) |
+
+## Languages
+
+English, Arabic (full RTL), Spanish, French and Portuguese, chosen for the Premier League's biggest
+non-English fan bases (MENA, Latin America and Spain, France and francophone Africa, Brazil and Portugal).
+Each language has its own commentator-style prompt (`agents/specialists.py`), native offline templates
+(`agents/templates.py`, `agents/templates_intl.py`) and a language guard that rejects mixed-language replies so
+the orchestrator retries or keeps the template. Player and club names stay as given in every language.
+
+![Foundry ES](docs/ui_foundry_es.png)
+
+## Public-URL spend guard
+
+`app/budget.py` decides per viewer stream whether Foundry may be used: at most 6 AI streams per client per hour,
+150 per UTC day (about $1.50 worst case) and 4 at the same time. Over a limit, the stream silently falls back to
+the offline agents, so the demo keeps working and the credit cannot be burned. All limits are environment variables.
 
 ## Synthetic data
 
@@ -191,7 +209,7 @@ Live test: `ECHO_FOUNDRY_IT=1 python -m pytest tests/test_foundry_integration.py
 | GET | `/api/matches`, `/api/matches/{id}/meta`, `/api/matches/{id}/events?upto=N` | data |
 | GET | `/api/matches/{id}/stats?upto=N` | full analytics snapshot |
 | POST | `/api/replays` `{match_id, speed 10–60, start_minute}` | start a replay |
-| GET | `/api/replays/{rid}/stream?persona=&lang=&club=&player=&from_now=` | SSE agent stream |
+| GET | `/api/replays/{rid}/stream?persona=&lang=en\|ar\|es\|fr\|pt&club=&player=&from_now=` | SSE agent stream (spend guard may switch it to offline agents) |
 | GET | `/api/replays/{rid}/state` · DELETE `/api/replays/{rid}` | live state, stop |
 | GET | `/api/config`, `/api/health` | mode, liveness |
 
@@ -204,7 +222,7 @@ LLM_MODE=offline python -m pytest -q
 There are 45 tests, and they run fully offline:
 - **generator:** schema, time ordering, goals match the scoreline, realism ranges, determinism, ball continuity, unique names, the shot cap;
 - **analytics:** bounds, monotonic xG, stoppage-time windows, momentum smoothing;
-- **agents:** English and Arabic, persona differences, the overlay schema, retry and recovery, forced fallback, the Foundry code path with stand-in agents, LLM calls not blocking the replay, building the Foundry agents;
+- **agents:** all five languages (template coverage, offline runs, the language guard), persona differences, the overlay schema, retry and recovery, forced fallback, the Foundry code path with stand-in agents, LLM calls not blocking the replay, building the Foundry agents;
 - **API and SSE:** endpoints, validation, the Arabic stream, the UI being served.
 
 `python scripts/screenshot.py` captures `docs/ui.png` with headless Chrome (needs Playwright).
@@ -214,7 +232,7 @@ There are 45 tests, and they run fully offline:
 ```
 generator/   synthetic match generator (CLI: python -m generator)
 analytics/   deterministic stats + explainability (agent tools)
-agents/      config, Foundry/Agent Framework wiring, specialists, EN/AR templates, orchestrator
+agents/      config, Foundry/Agent Framework wiring, specialists, EN/AR/ES/FR/PT templates, orchestrator
 app/         FastAPI: data API, replay service, SSE stream, static UI
 web/         single-page broadcast UI (vanilla JS)
 infra/       Azure Container Apps deploy script

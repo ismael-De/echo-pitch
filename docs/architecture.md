@@ -68,7 +68,7 @@ safe template ─────────────────► status "fal
 ```
 
 - Timeout per call: `LLM_TIMEOUT_S` (default 8 s). Retries: `LLM_RETRIES` (default 1).
-- The UI always has a deterministic EN/AR line or card first. LLM text only *upgrades* it, so outages degrade
+- The UI always has a deterministic line or card first. LLM text only *upgrades* it, so outages degrade
   quality, never availability.
 - `ECHO_FAULT_AGENTS` injects failures for demos and tests.
 
@@ -97,9 +97,10 @@ safe template ─────────────────► status "fal
 
 - `Dockerfile`: python:3.12-slim, non-root user, healthcheck, uvicorn on port 8000.
 - `infra/deploy_aca.sh`, using the az CLI:
-  - creates the resource group, ACR (cloud build) and the Container Apps environment;
-  - creates the app with a system-assigned identity, at least 1 replica (replays are kept in memory) and external ingress;
-  - grants the *Azure AI User* role on the Foundry account.
+  - creates the resource group, ACR (cloud build, or a local docker/podman build with `LOCAL_BUILD` where ACR Tasks are blocked) and the Container Apps environment;
+  - creates the app with a system-assigned identity, 0–1 replicas (scale to zero; one replica keeps in-memory replays and the spend guard consistent), 0.5 vCPU / 1 GiB and external ingress;
+  - grants the *Cognitive Services User* role on the Foundry account (keyless auth via managed identity).
+- Live: UAE North, same region as the Foundry resource.
 - `.github/workflows/ci.yml`: pytest offline, a check that the data is deterministic, a Docker build and a smoke test.
 
 ## Limitations and next steps

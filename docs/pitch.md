@@ -2,7 +2,7 @@
 
 ## One-liner
 Echo Pitch is a multi-agent match storyteller that turns live football events into explainable, personalised
-commentary, moment cards and broadcast-ready overlays, in English and Arabic.
+commentary, moment cards and broadcast-ready overlays, in English, Arabic, Spanish, French and Portuguese.
 
 ## Elevator pitch (about 150 words)
 Broadcast data tells fans *what* happened, but rarely *why it matters*, and everyone gets the same feed.
@@ -11,11 +11,11 @@ Echo Pitch ingests a live stream of synthetic match events and runs four special
 - **Stats** grounds everything in deterministic metrics (xG, pass difficulty, pressing, momentum).
 - **Moments** explains why a moment matters (game state, run of play, control vs chaos).
 - **Narrator** writes live commentary and recaps.
-- **Persona** reshapes it for an analyst or a casual fan, a favourite club or player, in English or Arabic.
+- **Persona** reshapes it for an analyst or a casual fan, a favourite club or player, in English, Arabic, Spanish, French or Portuguese.
 
 The agents share one match state, hand off to each other, retry failures and fall back to safe templates, so
 the broadcast never stalls. The output is timed, machine-readable overlay JSON plus a live web experience.
-It is packaged for **Azure Container Apps**. The result is the same match
+It runs live on **Azure Container Apps** (https://echo-pitch.nicebeach-1b47021e.uaenorth.azurecontainerapps.io). The result is the same match
 intelligence, made for every fan.
 
 ## What we built
@@ -23,7 +23,7 @@ intelligence, made for every fan.
 - A deterministic analytics layer exposed to the agents as function tools.
 - A multi-agent orchestrator (Stats → Moments → Narrator → Persona) with shared state, async LLM upgrades,
   retries and fallbacks.
-- An SSE replay API and a broadcast-style web UI: pitch map, overlays, momentum, Analyst/Fan, EN/AR with RTL.
+- An SSE replay API and a broadcast-style web UI: pitch map, overlays, momentum, Analyst/Fan, EN/AR/ES/FR/PT (RTL for Arabic).
 - A Docker image, an Azure Container Apps deploy script and GitHub Actions CI.
 
 ## Problem it solves

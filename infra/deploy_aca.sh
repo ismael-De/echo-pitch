@@ -38,8 +38,17 @@ echo "==> Container Apps environment $ENV_NAME"
 az containerapp env create -g "$RG" -n "$ENV_NAME" -l "$LOC" -o none
 
 echo "==> Container app $APP (LLM_MODE=$MODE)"
+# Registry pull auth: managed identity by default. "Express" environments (seen on Azure for Students) reject
+# registry identities, so ACR_ADMIN=1 uses the registry admin credential, stored by az as a Container Apps
+# secret (never in the repo). Foundry access is always keyless via the app's managed identity.
+if [ -n "${ACR_ADMIN:-}" ]; then
+  az acr update -n "$ACR" --admin-enabled true -o none
+  REG_AUTH="--registry-username $ACR --registry-password $(az acr credential show -n "$ACR" --query 'passwords[0].value' -o tsv)"
+else
+  REG_AUTH="--registry-identity system"
+fi
 az containerapp create -g "$RG" -n "$APP" --environment "$ENV_NAME" \
-  --image "$ACR.azurecr.io/echo-pitch:$TAG" --registry-server "$ACR.azurecr.io" --registry-identity system \
+  --image "$ACR.azurecr.io/echo-pitch:$TAG" --registry-server "$ACR.azurecr.io" $REG_AUTH \
   --system-assigned --ingress external --target-port 8000 \
   --min-replicas 0 --max-replicas 1 --cpu 0.5 --memory 1.0Gi \
   --env-vars LLM_MODE="$MODE" FOUNDRY_PROJECT_ENDPOINT="${FOUNDRY_PROJECT_ENDPOINT:-}" \
@@ -52,7 +61,7 @@ if [ "$MODE" = "foundry" ] && [ -n "${FOUNDRY_ACCOUNT_ID:-}" ]; then
   echo "==> Grant the app's managed identity access to Foundry (keyless auth via DefaultAzureCredential)"
   PRINCIPAL=$(az containerapp show -g "$RG" -n "$APP" --query identity.principalId -o tsv)
   az role assignment create --assignee-object-id "$PRINCIPAL" --assignee-principal-type ServicePrincipal \
-    --role "Azure AI User" --scope "$FOUNDRY_ACCOUNT_ID" -o none
+    --role "Cognitive Services User" --scope "$FOUNDRY_ACCOUNT_ID" -o none
 fi
 
 URL=$(az containerapp show -g "$RG" -n "$APP" --query properties.configuration.ingress.fqdn -o tsv)
