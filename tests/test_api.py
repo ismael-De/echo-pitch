@@ -98,6 +98,15 @@ def test_web_ui_served(client):
     assert client.get("/api/config").json()["llm_mode"] in ("offline", "foundry")
 
 
+def test_budget_defaults(monkeypatch):
+    for name in ("BUDGET_STREAMS_PER_IP_HOUR", "BUDGET_STREAMS_PER_DAY",
+                 "BUDGET_MAX_CONCURRENT", "BUDGET_MAX_REPLAYS"):
+        monkeypatch.delenv(name, raising=False)
+    from app.budget import Budget
+    b = Budget()
+    assert (b.per_ip_hour, b.per_day, b.max_concurrent, b.max_replays) == (6, 150, 4, 200)
+
+
 def test_budget_limits_and_release():
     from app.budget import Budget
     b = Budget()

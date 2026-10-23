@@ -8,7 +8,7 @@
 | Analytics | Python (pure functions) | Possession, pass difficulty, xG timeline, pressing index, momentum, key moments, control vs chaos, pressure shifts, rhythm |
 | Replay service | FastAPI | Replays an event log on a 10–60× match clock; supports joining mid-match |
 | Orchestrator | Python asyncio | Shared match state, handoffs, retries and fallbacks, background LLM upgrades, overlay timing |
-| Agents | Microsoft Agent Framework + Foundry | Stats, Moments, Narrator, Persona |
+| Agents | Microsoft Agent Framework + Foundry | Four roles: Stats, Moments, Narrator, Persona. Foundry also builds `echo-recap` for the Narrator's full-time recap |
 | UI | HTML/CSS/vanilla JS | Pitch map, overlays, scoreboard, ticker, moment cards, momentum chart, controls, recap |
 | Hosting | Azure Container Apps + ACR | Container, managed identity, external HTTPS ingress |
 
@@ -25,13 +25,14 @@ sequenceDiagram
   UI->>API: GET /stream?persona&lang&club&player (SSE)
   loop each event when the replay clock passes it
     R->>O: event
-    O->>O: Stats → Moments → Narrator → Persona (templates, instant)
+    O->>O: commentary template (Narrator → Persona)
+    O->>O: moment template, when it is a key moment (Moments → Persona)
     O-->>UI: match_event, commentary, moment_card, overlay, stats, agent_trace
     O-)F: background LLM upgrade (key moments, insights)
     F--)O: text (or timeout → retry → keep template)
     O-->>UI: commentary_update / moment_card (update)
   end
-  O->>F: recap (after flushing upgrades)
+  O->>F: recap via echo-recap (after flushing upgrades)
   O-->>UI: recap, end
 ```
 
@@ -49,13 +50,14 @@ state live, so the model is grounded in deterministic numbers.
 
 ## Handoffs
 
-1. **Stats** finds the trigger (goal, big chance at xG ≥ 0.30, key save, pressing spike above mean + 1.5σ) and builds the context:
-   margin, momentum just before the action, pressing value, control-vs-chaos label, turnovers.
-2. **Moments** turns the context into "why it matters".
-3. **Persona** adapts it to the viewer: analyst or fan, favourite-club perspective, ★ for the favourite player.
-4. **Render** emits the `moment_card` plus a timed `overlay` (lower third). Persona also filters which overlay kinds each audience sees.
-5. **Narrator** writes live lines for every notable event (routine lines are throttled to one per 40 match seconds)
-   and the recap, including a deterministic player of the match.
+The orchestrator chooses the path. The Stats agent is not a step inside the moment or commentary call.
+
+1. **Trigger.** The orchestrator detects a goal; a big chance (a shot that is not a goal and not saved, xG ≥ 0.30); a key save (a wonder save, or the shot xG ≥ 0.15); or a pressing spike (the closed window is at least 40 and at or above the mean + 1.5σ). It attaches analytics context: margin, momentum just before the action, pressing value, control-vs-chaos label, turnovers.
+2. **Moments** turns that context into "why it matters".
+3. **Persona** adapts it: analyst or fan, favourite-club perspective, ★ for the favourite player. An analyst's overlays add shot xG and pass difficulty. A fan's overlays add the speed alert. Both audiences may see the goal banner, moment card, stat bar and player tag (the player tag is emitted on the favourite player's touches).
+4. **Render** emits the `moment_card` plus a timed lower-third `overlay`.
+5. **Narrator** writes the commentary line, then Persona shapes it. Routine lines are throttled to one per 40 match seconds, unless the event is the viewer's favourite player. At full time the Narrator writes the recap, including a deterministic player of the match, through the separate `echo-recap` agent when Foundry is on.
+6. **Stats** writes one insight every 10 match minutes. Its tools (`get_live_stats`, `get_key_moments`, `get_explainability`) read the same blackboard.
 
 ## Failure recovery
 
@@ -67,10 +69,34 @@ attempt 2 ── ok ───────────────► status "rec
 safe template ─────────────────► status "fallback"
 ```
 
-- Timeout per call: `LLM_TIMEOUT_S` (default 8 s). Retries: `LLM_RETRIES` (default 1).
+- Timeout and retries are `LLM_TIMEOUT_S` and `LLM_RETRIES`. See Configuration below.
 - The UI always has a deterministic line or card first. LLM text only *upgrades* it, so outages degrade
   quality, never availability.
-- `ECHO_FAULT_AGENTS` injects failures for demos and tests.
+- `ECHO_FAULT_AGENTS` injects failures for demos and tests. `narrator` fails that agent's first call;
+  `narrator!` fails every call.
+
+## Configuration
+
+`Settings.from_env()` (`agents/config.py`) loads a repo-root `.env` unless `ECHO_NO_DOTENV` is set. Variables already in the environment win.
+
+| Variable | Default |
+|---|---|
+| `LLM_MODE` | `foundry` when `FOUNDRY_PROJECT_ENDPOINT` is set, otherwise `offline`. `foundry` with no endpoint falls back to offline and records a warning trace. Endpoint alias: `AZURE_AI_PROJECT_ENDPOINT`. |
+| `FOUNDRY_MODEL` | `gpt-5-mini`. Alias: `AZURE_AI_MODEL_DEPLOYMENT_NAME`. |
+| `LLM_TIMEOUT_S` | 20 seconds in `from_env()`. A `Settings()` built in code uses 8 seconds. `infra/deploy_aca.sh` sets 8 on the container. |
+| `LLM_RETRIES` | 1 |
+| `LLM_MAX_COMPLETION_TOKENS` | 400. A Narrator line uses at most 200. The recap agent uses at least 500. |
+| `LLM_REASONING_EFFORT` | `minimal`. Unset or empty keeps `minimal`. |
+| `LLM_PERSONA_REWRITE` | off (`0`). `1`, `true` or `yes` adds an extra Persona LLM pass. |
+| `FOUNDRY_CREDENTIAL` | `auto` (the default): Azure CLI when `az` is on PATH and `CONTAINER_APP_NAME` is unset; managed identity (`AZURE_CLIENT_ID`) when `CONTAINER_APP_NAME` is set; otherwise `DefaultAzureCredential`. `cli` and `managed` force those credentials. Any other value uses `DefaultAzureCredential`. |
+| `ECHO_FAULT_AGENTS` | empty |
+| `BUDGET_STREAMS_PER_IP_HOUR` | 6 |
+| `BUDGET_STREAMS_PER_DAY` | 150 |
+| `BUDGET_MAX_CONCURRENT` | 4 |
+| `BUDGET_MAX_REPLAYS` | 200 |
+| `ECHO_DATA_DIR` | the repo `data/` directory |
+
+`ECHO_FOUNDRY_IT=1` runs the two live Foundry tests. The test suite sets `ECHO_NO_DOTENV` so a developer `.env` is not loaded.
 
 ## Overlay contract (for a rendering partner)
 

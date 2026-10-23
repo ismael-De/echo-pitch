@@ -7,7 +7,7 @@ FOUNDRY_MODEL                  model deployment name, e.g. gpt-5-mini
   (alias AZURE_AI_MODEL_DEPLOYMENT_NAME)
 LLM_TIMEOUT_S                  per-agent call timeout (default 20)
 LLM_MAX_COMPLETION_TOKENS      output-token cap per call (default 400; recap 500)
-LLM_REASONING_EFFORT           minimal | low | medium (gpt-5 family; default minimal) - empty to omit
+LLM_REASONING_EFFORT           minimal | low | medium (gpt-5 family; default minimal). Unset or empty keeps minimal
 LLM_PERSONA_REWRITE            1 = extra Persona LLM pass (default 0: persona context is folded into prompts)
 FOUNDRY_CREDENTIAL             auto | cli | managed | default
 LLM_RETRIES                    retries before the template fallback (default 1)

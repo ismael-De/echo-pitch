@@ -1,4 +1,4 @@
-"""Echo Pitch API: match data, live stats state and SSE replay (no LLM yet).
+"""Echo Pitch API: match data, live stats, and the SSE replay with the agent stream.
 
 Run:  uvicorn app.main:app --reload      (data dir via ECHO_DATA_DIR, default ./data)
 """

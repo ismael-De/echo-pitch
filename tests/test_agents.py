@@ -30,6 +30,21 @@ def of(items, kind):
     return [d for k, d in items if k == kind]
 
 
+def test_from_env_defaults(monkeypatch):
+    """Locks the defaults documented in docs/architecture.md."""
+    for name in ("LLM_MODE", "LLM_TIMEOUT_S", "LLM_RETRIES", "LLM_MAX_COMPLETION_TOKENS",
+                 "LLM_REASONING_EFFORT", "LLM_PERSONA_REWRITE", "FOUNDRY_MODEL",
+                 "AZURE_AI_MODEL_DEPLOYMENT_NAME", "FOUNDRY_PROJECT_ENDPOINT",
+                 "AZURE_AI_PROJECT_ENDPOINT", "ECHO_FAULT_AGENTS"):
+        monkeypatch.delenv(name, raising=False)
+    s = Settings.from_env()
+    assert s.mode == "offline" and s.timeout_s == 20 and s.retries == 1
+    assert s.max_completion_tokens == 400 and s.reasoning_effort == "minimal"
+    assert s.persona_rewrite is False and s.model == "gpt-5-mini"
+    assert not s.fault_once and not s.fault_always
+    assert Settings().timeout_s == 8
+
+
 def test_settings_env(monkeypatch):
     monkeypatch.delenv("FOUNDRY_PROJECT_ENDPOINT", raising=False)
     monkeypatch.delenv("AZURE_AI_PROJECT_ENDPOINT", raising=False)

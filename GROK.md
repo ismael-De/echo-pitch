@@ -45,7 +45,7 @@ uvicorn app.main:app --port 8000
 ```
 Tests (in the same activated venv):
 ```powershell
-$env:LLM_MODE="offline"; python -m pytest -q     # expect 66 passed, 2 skipped
+$env:LLM_MODE="offline"; python -m pytest -q     # expect 68 passed, 2 skipped
 ```
 Offline mode uses templates only and makes no Azure calls. Do **not** create a `.env` with `LLM_MODE=foundry` unless Ismael asks. Foundry mode needs `az login` and costs credit.
 Optional: `python -m generator --demo --out data/` regenerates the demo matches (they are already committed).
@@ -84,7 +84,7 @@ When Grok is done, Ismael tells Grok Bot the branch or PR name (e.g. "review gro
 
 ## Prioritised improvement ideas (from docs/PLAN.md)
 1. **Real GitHub Copilot usage** (Ismael's own edit), then update the "GitHub Copilot (planned)" row in the README truthfully.
-2. **Docs-vs-code audit:** every claim in README/architecture (test counts, agents, env vars, languages) must match the code. Example: the README test section says "45 tests", but the suite now has 66 passing plus 2 skipped.
+2. **Docs-vs-code audit:** ✅ 23 Oct. README, architecture and pitch match the code (68 passed, 2 skipped; five languages; `LLM_TIMEOUT_S` is 20s from `from_env()` and 8s on the Container Apps deploy; handoffs follow the orchestrator).
 3. **Demo/video polish:** make the agent strip, retry (`ECHO_FAULT_AGENTS=narrator`) and fallback (`narrator!`) easy to show, plus an Arabic "wow" moment.
 4. **Real-world impact:** surface cost per match per viewer and audience reach in the UI or README.
 5. **UX:** first-load experience (the app scales to zero, so cold starts take ~20 s), mobile layout, accessibility, clearer overlays.

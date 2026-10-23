@@ -21,8 +21,8 @@ intelligence, made for every fan.
 ## What we built
 - A seeded synthetic football event generator (about 1,900 events per match, xG-consistent goals, dramatic moments).
 - A deterministic analytics layer exposed to the agents as function tools.
-- A multi-agent orchestrator (Stats → Moments → Narrator → Persona) with shared state, async LLM upgrades,
-  retries and fallbacks.
+- A multi-agent orchestrator. Commentary is Narrator then Persona. A key moment is Moments then Persona.
+  Stats owns the numbers. Shared state, async LLM upgrades, retries and fallbacks.
 - An SSE replay API and a broadcast-style web UI: pitch map, overlays, momentum, Analyst/Fan, EN/AR/ES/FR/PT (RTL for Arabic).
 - A Docker image, an Azure Container Apps deploy script and GitHub Actions CI.
 
