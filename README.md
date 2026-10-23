@@ -33,7 +33,7 @@ deployment in a Microsoft Foundry project, measured at about $0.01 per match per
 
 Broadcast graphics and data feeds tell viewers *what* happened (a shot, 0.41 xG, 52% possession), but rarely
 *why it matters*. And every viewer gets the same output. A data-hungry analyst and a first-time fan in Amman or
-Lagos want very different stories from the same 2,000 events. Writing those stories by hand, live, in several
+Lagos want very different stories from the same match (about 1,900 events). Writing those stories by hand, live, in several
 languages, does not scale.
 
 ## What Echo Pitch does: the five pipeline stages (Rules §4.1)
@@ -61,9 +61,10 @@ flowchart LR
   R -->|events| O
   subgraph O["Orchestrator (shared match state)"]
     direction LR
-    S["Stats agent<br/>tools: analytics/*"] --> M["Moments agent<br/>why it matters"]
-    M --> N["Narrator agent<br/>commentary + recap in 5 languages"]
-    N --> P["Persona agent<br/>analyst/fan · club · player"]
+    S["Stats agent<br/>insights + tools"]
+    M["Moments agent<br/>why it matters"] --> P["Persona agent<br/>analyst/fan · club · player"]
+    N["Narrator agent<br/>commentary + recap"] --> P
+    S ~~~ M
   end
   O <-->|"async LLM calls"| F["Microsoft Foundry<br/>model deployment"]
   O -->|"SSE: commentary · moment_card · overlay · stats · agent_trace · recap"| UI["Web UI<br/>pitch · overlays · ticker · momentum"]
@@ -82,7 +83,7 @@ More detail is in [docs/architecture.md](docs/architecture.md).
 |---|---|---|
 | **Stats** | Owns every number and never invents one. Gives periodic insights. | Agent Framework function tools: `get_live_stats`, `get_key_moments`, `get_explainability` (wrapping `analytics/`) |
 | **Moments** | Explains why a moment matters | Moment JSON plus context: margin, momentum before the action, xG, pressing phase |
-| **Narrator** | Live commentary lines and the full-time recap, EN and AR | Event facts, style, language |
+| **Narrator** | Live commentary lines and the full-time recap, in EN, AR, ES, FR and PT. The recap is a separate Foundry agent (`echo-recap`) | Event facts, style, language |
 | **Persona** | Shapes output for the viewer and decides which overlays to show | Persona, favourite club and player, language |
 
 Each agent is an `agent_framework.Agent` on a shared `agent_framework.foundry.FoundryChatClient`, authenticated
@@ -92,13 +93,14 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 
 - **Shared state (blackboard):** the orchestrator holds the event log, score, fouls, moment log and agent trace.
   Every agent reads from it, and the Stats tools query it live.
-- **Handoffs:** for each key moment the work passes Stats (context) → Moments (why) → Persona (audience) →
-  render (card and overlay). Narrator → Persona handles commentary lines.
+- **Handoffs:** the orchestrator detects a key moment, attaches the analytics context, then Moments explains why and
+  Persona shapes it. Commentary is Narrator, then Persona. The Stats agent writes a periodic insight and owns the
+  function tools. See [docs/architecture.md](docs/architecture.md).
 - **Never blocks the broadcast:** every line and card is rendered immediately from deterministic templates in all five languages.
   When Foundry is configured, LLM calls run **concurrently in the background** and stream
   `commentary_update` and upgraded `moment_card` events as they finish, so slow model calls never make the
   replay lag.
-- **Recovery:** each agent call has a timeout and *N* retries. If they all fail, a minimal **safe template**
+- **Recovery:** each agent call has a timeout (`LLM_TIMEOUT_S`: 20 seconds from `Settings.from_env()`, 8 seconds on the Container Apps deploy) and `LLM_RETRIES` retries (default 1). If they all fail, a minimal **safe template**
   is used. Every step is emitted as an `agent_trace` (`ok` / `recovered` / `fallback`, attempts, latency) and
   shown in the UI's agent strip.
 - **Fault injection for demos:** `ECHO_FAULT_AGENTS=narrator` makes the first call fail so you can watch the
@@ -108,10 +110,10 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 
 | Technology | How |
 |---|---|
-| **Microsoft Foundry** | `gpt-5-mini` deployment behind all four agents (Narrator also writes the recap), via the Foundry project endpoint |
+| **Microsoft Foundry** | `gpt-5-mini` deployment for Stats, Moments, Narrator, Persona and the Narrator's recap agent (`echo-recap`), via the Foundry project endpoint |
 | **Microsoft Agent Framework** | `Agent`, `FoundryChatClient`, Python function tools; multi-agent orchestration with handoffs |
 | **Azure Container Apps** | Live deployment (UAE North, 0.5 vCPU / 1 GiB, scale 0–1), keyless Foundry access and image pull via a user-assigned managed identity with the `Cognitive Services User` role (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
-| **Azure Container Registry** | Cloud image build (`az acr build`) |
+| **Azure Container Registry** | Cloud image build (`az acr build`), or a local docker/podman build when `LOCAL_BUILD` is set (`infra/deploy_aca.sh`) |
 | **GitHub Copilot** *(planned)* | Planned for upcoming development work; this row will be updated once it is used |
 | **GitHub Actions** | CI: tests, determinism check, Docker build and smoke test (`.github/workflows/ci.yml`) |
 
@@ -183,7 +185,7 @@ is `scripts/foundry_eval.py` and the raw results are in `docs/foundry_eval.json`
 |---|---|---|
 | LLM calls per match | 35 | 35 |
 | LLM latency, p50 / p95 | 2.8 s / 3.9 s | 2.7 s / 4.3 s |
-| Replay lag (event arrival vs schedule) | ≤ 1.0 s max | ≤ 1.0 s max |
+| Replay lag (event arrival vs schedule) | 1.01 s max | 1.00 s max |
 | Tokens in / out | 17.1k / 2.7k | 17.0k / 3.3k |
 | Cost per match per viewer stream | about $0.010 | about $0.011 |
 | Agent failures | 0 | 0 |
@@ -219,11 +221,11 @@ Live test: `ECHO_FOUNDRY_IT=1 python -m pytest tests/test_foundry_integration.py
 LLM_MODE=offline python -m pytest -q
 ```
 
-There are 45 tests, and they run fully offline:
-- **generator:** schema, time ordering, goals match the scoreline, realism ranges, determinism, ball continuity, unique names, the shot cap;
+68 tests pass offline. Two live Foundry tests stay skipped unless `ECHO_FOUNDRY_IT=1`:
+- **generator:** schema, time ordering, goals match the scoreline, realism ranges, determinism, ball continuity, unique names, the shot cap, the CLI;
 - **analytics:** bounds, monotonic xG, stoppage-time windows, momentum smoothing;
-- **agents:** all five languages (template coverage, offline runs, the language guard), persona differences, the overlay schema, retry and recovery, forced fallback, the Foundry code path with stand-in agents, LLM calls not blocking the replay, building the Foundry agents;
-- **API and SSE:** endpoints, validation, the Arabic stream, the UI being served.
+- **agents:** all five languages (template coverage, offline runs, the language guard), persona differences, the overlay schema, retry and recovery, forced fallback, environment defaults, the Foundry code path with stand-in agents, LLM calls not blocking the replay, building the Foundry agents;
+- **API and SSE:** endpoints, validation, the Arabic stream, the spend guard (including its defaults), the UI being served.
 
 `python scripts/screenshot.py` captures `docs/ui.png` with headless Chrome (needs Playwright).
 

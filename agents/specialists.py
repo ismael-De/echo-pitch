@@ -134,7 +134,7 @@ class MomentsAgent(Base):
 
 # ---------------------------------------------------------------- Narrator
 class NarratorAgent(Base):
-    """Live commentary lines and the full-time recap, in English or Arabic (two Agent instances: line + recap)."""
+    """Live commentary lines and the full-time recap, in all five languages (two Agent instances: line + recap)."""
     name = "narrator"
 
     def __init__(self, llm_agent: Any | None = None, recap_agent: Any | None = None):
