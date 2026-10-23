@@ -8,7 +8,7 @@ All data is fictional and synthetic.
 - **Deadline:** 28 Oct 2026, 9:59 AM Amman (UTC+3). Solo entry by Ismael Sarhan.
 - **Category:** Multi-Agent (primary), Foundry (secondary).
 - **Judging (20% each):** technological implementation · agentic design & innovation · real-world impact · UX & presentation · category fit. The README's judging map must stay accurate, and **the docs must match the code exactly** (past winners were disqualified for mismatches).
-- **Plan and status:** `docs/PLAN.md`. Architecture: `docs/architecture.md`. Pitch: `docs/pitch.md`. Video script draft: `docs/video_script.md`.
+- **Plan and status:** `docs/PLAN.md`. Architecture: `docs/architecture.md`. Pitch: `docs/pitch.md`. Video script draft: `docs/video_script.md`. Submission checklist: `docs/SUBMISSION.md`.
 
 ## Architecture (short)
 Generator → replay service (FastAPI, SSE, 10–60×) → orchestrator with a shared blackboard → 4 Microsoft Agent Framework agents (Stats with function tools, Moments, Narrator, Persona) on a Foundry `gpt-5-mini` deployment → web UI.
@@ -88,4 +88,4 @@ When Grok is done, Ismael tells Grok Bot the branch or PR name (e.g. "review gro
 3. **Demo/video polish:** make the agent strip, retry (`ECHO_FAULT_AGENTS=narrator`) and fallback (`narrator!`) easy to show, plus an Arabic "wow" moment.
 4. **Real-world impact:** surface cost per match per viewer and audience reach in the UI or README.
 5. **UX:** first-load experience (the app scales to zero, so cold starts take ~20 s), mobile layout, accessibility, clearer overlays.
-6. Submission checklist for the 27th: video Public on YouTube, repo public, form filled.
+6. **Submission checklist:** `docs/SUBMISSION.md` (23 Oct). Still Ismael: video Public on YouTube, repo public, form filled.

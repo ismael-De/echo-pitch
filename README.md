@@ -150,13 +150,27 @@ the offline agents, so the demo keeps working and the credit cannot be burned. A
 
 ## Run it
 
+Needs Python 3.11+. Offline mode makes no Azure calls, and it needs no `.env`. The demo matches in `data/` are already in the repo, so the generator line is optional.
+
 ```bash
-python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate
+python -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
 python -m generator --demo --out data/               # optional: data/ is already included
-LLM_MODE=offline uvicorn app.main:app --port 8000    # Windows PowerShell: $env:LLM_MODE="offline"; uvicorn app.main:app
-# open http://localhost:8000  and press Kick off
-# deep link: /?match=EP-2026-002&speed=60&start=82&club=home&lang=ar&persona=analyst&autoplay=1
+LLM_MODE=offline uvicorn app.main:app --port 8000
+# open http://localhost:8000 and press Kick off
+# deep link (autoplay honours start=; Kick off and Restart always begin at 0'):
+# /?match=EP-2026-002&speed=60&start=82&club=home&lang=ar&persona=analyst&autoplay=1
+```
+
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1      # if blocked: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+pip install -r requirements.txt
+$env:LLM_MODE="offline"
+uvicorn app.main:app --port 8000
+# open http://localhost:8000 and press Kick off
 ```
 
 **With Microsoft Foundry** (copy `.env.example`):
@@ -238,6 +252,6 @@ agents/      config, Foundry/Agent Framework wiring, specialists, EN/AR/ES/FR/PT
 app/         FastAPI: data API, replay service, SSE stream, static UI
 web/         single-page broadcast UI (vanilla JS)
 infra/       Azure Container Apps deploy script
-docs/        architecture, demo video script, pitch, screenshots
+docs/        architecture, demo video script, pitch, submission checklist, screenshots
 tests/       pytest suite
 ```

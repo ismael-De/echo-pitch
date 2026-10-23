@@ -33,7 +33,7 @@ Status marks: ✅ done (checked against the repo on 23 Oct) · ⬜ remaining.
 | Sat 24 | ✅ Azure Container Apps deployment (done early) | ⬜ A real GitHub Copilot edit |
 | Sun 25 | ✅ Draft video script under 2 min (`docs/video_script.md`) with an Arabic "wow" moment | ⬜ Rewrite the script in his own words and rehearse |
 | Mon 26 | ✅ Docs match the code (done early, 23 Oct) | ⬜ Record the video and upload it to YouTube as Public |
-| Tue 27 | ⬜ Submission checklist and last fixes | ⬜ Make the repo public, fill in the submission form |
+| Tue 27 | ✅ Submission checklist (`docs/SUBMISSION.md`, done early, 23 Oct) | ⬜ Make the repo public, fill in the submission form |
 | Wed 28 | ⬜ Final confirmation | Deadline 9:59 AM; better to submit on Tuesday |
 
 ## Done so far
@@ -46,7 +46,8 @@ Status marks: ✅ done (checked against the repo on 23 Oct) · ⬜ remaining.
 - ✅ Docs-vs-code review: fixed the gpt-4o-mini mention and the premature "deployed on Azure" claim
 - ✅ Docs-vs-code audit (23 Oct): test count is 68 passed and 2 skipped, Narrator covers all five languages, timeout and env defaults, handoffs, and the ACR `LOCAL_BUILD` path
 - ✅ New Foundry screenshots in English, Arabic and Spanish
-- ✅ Video script draft (1:50) in `docs/video_script.md`; Ismael must rewrite it in his own words
+- ✅ Video script draft (1:50) in `docs/video_script.md`; on-screen shots match the UI (23 Oct). Ismael must rewrite it in his own words
+- ✅ Submission checklist in `docs/SUBMISSION.md` (23 Oct). Still Ismael: public YouTube video, public repo, submission form
 - ✅ 5 languages (AR, EN, ES, FR, PT) with a language dropdown and tests
 - ✅ Live on Azure: https://echo-pitch-web.blackriver-a826d80e.uaenorth.azurecontainerapps.io
 - ✅ Credit guard: 6 AI streams per visitor per hour, 150 per day, 4 at once, then offline templates
