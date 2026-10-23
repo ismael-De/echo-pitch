@@ -55,13 +55,30 @@ Optional: `python -m generator --demo --out data/` regenerates the demo matches 
 - Azure resource group `echo-pitch-rg`: container app `echo-pitch-web`, environment `echo-pitch-std`, user-assigned identity `echo-pitch-id` (AcrPull + Cognitive Services User, so no keys), registry `echopitch11913`.
 - Redeploy = `infra/deploy_aca.sh`. **Never run deploys, `az` commands, or change Azure resources without Ismael's explicit OK.** The credit is limited (Azure for Students).
 
+## Team workflow
+- **Grok** (Grok CLI on Ismael's Windows PC) writes code.
+- **Grok Bot** (on its own computer) reviews, tests, merges into main and redeploys to Azure.
+
+Rules for Grok:
+1. Always `git checkout main && git pull` first.
+2. Work on a new branch named `grok/<short-topic>` (e.g. `git checkout -b grok/mobile-layout`). **Never commit to main.**
+3. Keep each branch to one focused change.
+4. Run `$env:LLM_MODE="offline"; python -m pytest -q` before pushing. All tests must pass.
+5. Push the branch (`git push -u origin grok/<short-topic>`) and open a PR with `gh pr create --base main`, or just push and tell Ismael the branch name.
+6. The PR description says **what changed, why, and how to test**.
+
+Grok Bot then reviews the PR, runs the tests, merges into main, and redeploys to Azure with `infra/deploy_aca.sh`.
+
+### How to hand off
+When Grok is done, Ismael tells Grok Bot the branch or PR name (e.g. "review grok/mobile-layout" or "PR #3").
+
 ## Rules
 1. Keep **all tests passing** (`LLM_MODE=offline python -m pytest -q`). Add tests for new behaviour.
 2. **Never commit secrets**: no `.env`, keys, endpoints with keys, or tokens. `.env` is gitignored; only `.env.example` is tracked.
 3. Keep **all 5 languages (EN/AR/ES/FR/PT)** working: any new user-facing string needs all 5 in `agents/templates*.py` / `web/app.js`, and Arabic must stay RTL-correct (scoreboard stays LTR).
 4. Don't weaken the **rate limits** in `app/budget.py` (6 Foundry streams per IP per hour, 150 per day, 4 concurrent). Over the limit → offline fallback, never an error.
 5. The broadcast must never block on an LLM call. Keep the template-first, background-upgrade design and the retry/fallback traces.
-6. Small, focused commits with clear messages. Update README/docs in the same commit when behaviour changes, so the docs always match the code.
+6. Small, focused commits on a `grok/<topic>` branch (see Team workflow) with clear messages. Update README/docs in the same commit when behaviour changes, so the docs always match the code.
 7. Data stays synthetic and fictional (no real clubs or players).
 8. Don't make the repo public (planned for Ismael on 27 Oct).
 
