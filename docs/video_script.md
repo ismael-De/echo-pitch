@@ -46,3 +46,19 @@ The Arabic clip is a real `/api/tts` response from the live app. The browser rec
 ### v3 (27 Oct 2026): `echo_pitch_demo_v3.mp4`, 1:46
 - The raw JSON audit page (1:12–1:15 in v2) is replaced by a styled audit-log card. The card is rendered from a real `GET /api/replays/{id}/audit` response on the live app (15 verifier checks, 1 producer approval).
 - The Arabic clip is a real Arabic commentary line from the live app ("يا لها من لحظة! Pavel Garrow يهزّ الشباك لـSaltmarsh FC! SHF 2-1 BRT"), spoken by `/api/tts`. The response header was `X-Voice: ar-JO-TaimNeural` (Arabic, Jordan). The text is Modern Standard Arabic, so it has a broadcast register, not a Jordanian dialect.
+
+### v4 (27 Oct 2026, night): `echo_pitch_demo_v4.mp4`, 1:49, TTS narration (en-US-AndrewNeural)
+Recorded against the live build `33c236f`.
+
+| Time | On screen | Narration |
+|---|---|---|
+| 0:00 | Title card | Echo Pitch is a multi-agent football storyteller on Azure AI Foundry. Every line is verified, spoken, and accessible. |
+| 0:09 | Live app, Analyst, 🛡 evidence opened | Four writer agents … the Verifier checks every number and player name … Click the shield to see the evidence. |
+| 0:27 | "Measured, not claimed" card | 472 of 476 planted errors caught, zero unverified lines, groundedness 4.77/5, wrong-team errors a known gap. |
+| 0:48 | Live app with 🔊 on, language switched English → العربية mid-match. The UI flips to RTL, and the 86' goal line is spoken by **ar-SA-HamedNeural** (a real `/api/tts` response, `X-Voice: ar-SA-HamedNeural`) | Fans hear it too … Switch the language mid-match, and the voice switches with it. |
+| 1:07 | 🎬 Producer panel: an AI draft is approved, then the new styled 📜 Audit panel (time, line, verifier result, evidence, approver, action) | Producer mode holds AI rewrites for a human OK. The audit log shows every Verifier check, its evidence, and every producer decision, in the viewer's language. |
+| 1:25 | MCP card (Copilot CLI calling the live MCP server) | The stats and the Verifier are also an MCP server … |
+| 1:36 | ♿ Audio-first: yellow banner, large high-contrast text | Audio-first mode gives blind and low-vision fans large, high-contrast text, and speaks every line. |
+| 1:44 | End card | Echo Pitch. Every match, explained and verified, for every fan. |
+
+The raw JSON audit view is gone from the app: 📜 Audit now opens a styled, localized panel.
