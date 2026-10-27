@@ -114,7 +114,7 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 | **Microsoft Agent Framework** | `Agent`, `FoundryChatClient`, Python function tools; multi-agent orchestration with handoffs |
 | **Azure Container Apps** | Live deployment (UAE North, 0.5 vCPU / 1 GiB, scale 0–1), keyless Foundry access and image pull via a user-assigned managed identity with the `Cognitive Services User` role (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
 | **Azure Container Registry** | Cloud image build (`az acr build`), or a local docker/podman build when `LOCAL_BUILD` is set (`infra/deploy_aca.sh`) |
-| **GitHub Copilot** *(planned)* | Planned for upcoming development work; this row will be updated once it is used |
+| **GitHub Copilot** | Copilot CLI (agent mode) wrote the narrator fallback test `test_narrator_commentary_uses_safe_line_after_failure` in `tests/test_agents.py` and ran the suite. The rest of the code was not written with Copilot |
 | **GitHub Actions** | CI: tests, determinism check, Docker build and smoke test (`.github/workflows/ci.yml`) |
 
 ## Languages

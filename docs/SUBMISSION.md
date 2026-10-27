@@ -17,7 +17,7 @@ Marks: ✅ checked in this repo on 23 Oct 2026 · ⬜ still yours to do.
 | Video script matches the UI | ✅ | `docs/video_script.md` on-screen column follows `web/index.html` and `web/app.js`. Details below. |
 | Tests | ✅ | Offline suite is 68 passed, 2 skipped. The two Foundry tests stay skipped unless `ECHO_FOUNDRY_IT=1`. |
 | Five languages, synthetic data | ✅ | EN / AR (RTL, scoreboard stays LTR) / ES / FR / PT. Clubs and players are fictional. |
-| GitHub Copilot | ⬜ | README, pitch and plan still say **planned**. That edit is Ismael's. This checklist does not change it. |
+| GitHub Copilot | ✅ | Copilot CLI added `test_narrator_commentary_uses_safe_line_after_failure` in `tests/test_agents.py`. README, pitch and plan describe only that. |
 
 ## What the UI actually shows (for the video)
 
@@ -46,7 +46,7 @@ The goal shot in the script uses `start=72`. The README jump-in link stays `star
 ## Still to do before the deadline
 
 - ⬜ Rewrite `docs/video_script.md` in your own words. Judges notice a generic script. Keep the shots.
-- ⬜ Record under 2:00 (target 1:50). Say **Multi-Agent** once. Mention GitHub Copilot only after you have used it in the repo.
+- ⬜ Record under 2:00 (target 1:50). Say **Multi-Agent** once. GitHub Copilot may be mentioned only for the narrator fallback test it wrote.
 - ⬜ Upload the video to YouTube as **Public**, with time to spare before Wednesday morning.
 - ⬜ Make the repo public (do this yourself, on the 27th):
 
@@ -55,7 +55,7 @@ gh repo edit ismael-De/echo-pitch --visibility public --accept-visibility-change
 ```
 
 - ⬜ Fill in the hackathon submission form. Point it at the public repo, the public video and the live URL.
-- ⬜ GitHub Copilot: one real edit, then change the README row from "planned" so the docs still match the code.
+- ✅ GitHub Copilot: one real edit (narrator fallback test), README row updated.
 - ⬜ Innovation Studio, if that account step is still open (`docs/PLAN.md`, Thu 22).
 
 ## Leave alone

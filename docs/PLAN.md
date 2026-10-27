@@ -18,7 +18,7 @@ Status marks: ✅ done (checked against the repo on 23 Oct) · ⬜ remaining.
 
 | Criterion | Status | What's missing |
 |---|---|---|
-| Technological implementation | Strong | ⬜ a real GitHub Copilot edit (README still says "planned") · ✅ live Azure deployment |
+| Technological implementation | Strong | ✅ a real GitHub Copilot edit (Copilot CLI added a narrator fallback test) · ✅ live Azure deployment |
 | Agentic design & innovation | Strong | ⬜ show the agent strip, retry and fallback in the video |
 | Real-world impact | Medium | numbers: ~1 cent per match per viewer (✅ in README), Arabic commentary for a 400M audience |
 | UX & presentation | Medium | ⬜ story video · ✅ README with images + GIF · ✅ natural Arabic commentary |
@@ -30,7 +30,7 @@ Status marks: ✅ done (checked against the repo on 23 Oct) · ⬜ remaining.
 |---|---|---|
 | Thu 22 | ✅ Better Arabic, smooth commentary swap-in, RTL fixes | ⬜ Activate Innovation Studio in an Incognito window |
 | Fri 23 | ✅ README with GIF, architecture diagram, eval results | ⬜ Try the UI and give feedback |
-| Sat 24 | ✅ Azure Container Apps deployment (done early) | ⬜ A real GitHub Copilot edit |
+| Sat 24 | ✅ Azure Container Apps deployment (done early) | ✅ A real GitHub Copilot edit (done Oct 27) |
 | Sun 25 | ✅ Draft video script under 2 min (`docs/video_script.md`) with an Arabic "wow" moment | ⬜ Rewrite the script in his own words and rehearse |
 | Mon 26 | ✅ Docs match the code (done early, 23 Oct) | ⬜ Record the video and upload it to YouTube as Public |
 | Tue 27 | ✅ Submission checklist (`docs/SUBMISSION.md`, done early, 23 Oct) | ⬜ Make the repo public, fill in the submission form |

@@ -120,6 +120,15 @@ def test_fallback_when_agent_always_fails(match):
     assert of(items, "recap")[0]["source"] == "safe_template"
 
 
+def test_narrator_commentary_uses_safe_line_after_failure(match):
+    meta, ev = match
+    o, items = run(meta, ev[:300], Prefs(), Settings(fault_always={"narrator"}, retries=0))
+    comments = [c for c in of(items, "commentary") if c["kind"] != "insight"]
+    assert comments and all(c["source"] == "safe_template" for c in comments)
+    assert all(c["text"] for c in comments)
+    assert any(t["agent"] == "narrator" and t["status"] == "fallback" for t in o.trace)
+
+
 class FakeLLM:
     def __init__(self, fail_first=False):
         self.calls, self.fail_first = 0, fail_first

@@ -32,7 +32,7 @@ or commentary for every audience.
 
 ## Microsoft and Azure technology
 Microsoft Foundry · Microsoft Agent Framework · Azure Container Apps · Azure Container Registry · Managed
-Identity · GitHub Actions (GitHub Copilot planned)
+Identity · GitHub Actions (GitHub Copilot CLI wrote a narrator fallback test)
 
 ## Category
 Primary: **Best Multi-Agent System**. Also relevant: Best Use of Microsoft Foundry.
