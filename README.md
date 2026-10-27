@@ -13,19 +13,40 @@ All clubs, players and data are **fictional and synthetic**.
 
 ![Echo Pitch replay](docs/replay.gif)
 
+## Measured, not claimed ([docs/EVAL.md](docs/EVAL.md))
+
+| | Result (from `scripts/eval_verifier.py`, 27 Oct 2026) |
+|---|---|
+| Planted factual errors that got past the **Verifier** in real gpt-5-mini lines (numbers and names, 5 languages) | **4 of 476** (472 caught, 99.2%) |
+| Planted errors caught in template lines | **7,005 of 7,005** |
+| Correct lines wrongly rejected | **0 of 3,200** |
+| Unverified LLM lines shown to viewers | **0 of 170** |
+| Groundedness of the lines shown (LLM-as-judge, 1 to 5) | **4.77** (EN 4.97 · AR 4.97 · ES 4.86 · FR 4.46 · PT 4.57) |
+| Verifier latency | p50 **0.12 ms** per line |
+| Known gap | wrong-*team* attribution is not caught (0 of 81). See EVAL.md |
+
+**New in v2:**
+- 🛡 a **Verifier (Guard) agent** fact-checks every number and name before anything is shown, with evidence footnotes on every line.
+- 🔊 **Azure AI Speech** neural voices in all 5 languages, including Arabic with a Jordanian voice.
+- ♿ an **audio-first mode** for blind and low-vision fans.
+- 🔌 an **MCP server** that exposes the stats and the Verifier as tools. Copilot CLI and a Foundry agent have both been run against it.
+- 🎬 a **producer approval** mode with an **audit log**.
+
+
 ## Hackathon category
 
-**Primary: Multi-Agent.** Four specialist agents (Stats with function tools, Moments, Narrator, Persona) are
-coordinated by an orchestrator that shares match state, retries failed calls and falls back to deterministic
-templates, so the broadcast never stalls. **Also relevant: Foundry.** Every agent runs on a `gpt-5-mini`
+**Primary: Multi-Agent.** Four specialist writer agents (Stats with function tools, Moments, Narrator, Persona)
+and a deterministic **Verifier (Guard) agent** are coordinated by an orchestrator. The orchestrator shares match state,
+sends a rejected draft back to its writer once, retries failed calls and falls back to verified templates, so the
+broadcast never stalls and never shows an unchecked number. **Also relevant: Foundry.** Every agent runs on a `gpt-5-mini`
 deployment in a Microsoft Foundry project, measured at about $0.01 per match per viewer (see below).
 
 | Judging criterion | Where to look |
 |---|---|
-| Technological implementation | synthetic generator (`generator/`), tests + CI, Foundry eval (`docs/foundry_eval.json`) |
-| Agentic design & innovation | [Architecture](#architecture), retry/fallback trace bar in the UI |
-| Real-world impact | per-viewer personalisation (Fan/Analyst, club, player) in English, Arabic, Spanish, French and Portuguese |
-| UX & presentation | the replay UI below, demo video |
+| Technological implementation | Foundry + Agent Framework + Azure AI Speech + MCP; measured eval ([docs/EVAL.md](docs/EVAL.md)); 86 tests + CI; live end-to-end script (`scripts/e2e_live.py`) |
+| Agentic design & innovation | writer → Verifier → one rewrite → verified fallback; evidence on every line; [MCP server](#mcp-server-stats--verifier-as-tools); producer approval + audit log; retry/fallback trace bar |
+| Real-world impact | per-viewer personalisation (Fan/Analyst, club, player) in 5 languages; spoken commentary and an audio-first mode for blind fans; an audit trail for broadcasters |
+| UX & presentation | the replay UI below, 🛡 evidence badges, demo video |
 
 ![Echo Pitch UI](docs/ui.png)
 
@@ -64,8 +85,13 @@ flowchart LR
     S["Stats agent<br/>insights + tools"]
     M["Moments agent<br/>why it matters"] --> P["Persona agent<br/>analyst/fan · club · player"]
     N["Narrator agent<br/>commentary + recap"] --> P
+    P --> V["🛡 Verifier agent<br/>numbers + names vs facts"]
+    V -.->|"rejected: rewrite once"| N
     S ~~~ M
   end
+  O --> AU[("audit log")]
+  V --- MCP["MCP server /mcp/<br/>stats + verify tools"]
+  O -->|"lines"| SP["Azure AI Speech<br/>neural voices"]
   O <-->|"async LLM calls"| F["Microsoft Foundry<br/>model deployment"]
   O -->|"SSE: commentary · moment_card · overlay · stats · agent_trace · recap"| UI["Web UI<br/>pitch · overlays · ticker · momentum"]
   subgraph Azure["Azure Container Apps"]
@@ -85,6 +111,7 @@ More detail is in [docs/architecture.md](docs/architecture.md).
 | **Moments** | Explains why a moment matters | Moment JSON plus context: margin, momentum before the action, xG, pressing phase |
 | **Narrator** | Live commentary lines and the full-time recap, in EN, AR, ES, FR and PT. The recap is a separate Foundry agent (`echo-recap`) | Event facts, style, language |
 | **Persona** | Shapes output for the viewer and decides which overlays to show | Persona, favourite club and player, language |
+| **Verifier (Guard)** | Checks every line (template or LLM) before it is shown. Every number must match the facts the writer received (with display rounding, and score pairs next to team codes must match the score). Every player name must belong to those facts. Unknown names are rejected. It returns the evidence for each claim. No LLM, about 0.1 ms per line | `agents/verifier.py`, shared with `/api/verify` and the MCP tool `verify_commentary` |
 
 Each agent is an `agent_framework.Agent` on a shared `agent_framework.foundry.FoundryChatClient`, authenticated
 with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys).
@@ -103,6 +130,8 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 - **Recovery:** each agent call has a timeout (`LLM_TIMEOUT_S`: 20 seconds from `Settings.from_env()`, 8 seconds on the Container Apps deploy) and `LLM_RETRIES` retries (default 1). If they all fail, a minimal **safe template**
   is used. Every step is emitted as an `agent_trace` (`ok` / `recovered` / `fallback`, attempts, latency) and
   shown in the UI's agent strip.
+- **Verifier loop:** a writer's draft goes to the Verifier. If it is rejected, it goes back to the same writer once with the problems ("number 0.64 is not in the match facts"). If the rewrite fails too, the already-shown verified template line stays. Every verdict is an `agent_trace` (`verifier.<task> → ok | rejected | fallback`) and an entry in the replay's audit log.
+- **Producer approval (optional, 🎬):** with `approval=true`, LLM rewrites arrive as *pending* drafts. A producer approves or rejects each one in the UI, and the decision is recorded in `GET /api/replays/{id}/audit`.
 - **Fault injection for demos:** `ECHO_FAULT_AGENTS=narrator` makes the first call fail so you can watch the
   retry; `narrator!` makes every call fail so you can watch the fallback.
 
@@ -113,9 +142,44 @@ with `DefaultAzureCredential` (a managed identity on Azure, so there are no keys
 | **Microsoft Foundry** | `gpt-5-mini` deployment for Stats, Moments, Narrator, Persona and the Narrator's recap agent (`echo-recap`), via the Foundry project endpoint |
 | **Microsoft Agent Framework** | `Agent`, `FoundryChatClient`, Python function tools; multi-agent orchestration with handoffs |
 | **Azure Container Apps** | Live deployment (UAE North, 0.5 vCPU / 1 GiB, scale 0–1), keyless Foundry access and image pull via a user-assigned managed identity with the `Cognitive Services User` role (`Dockerfile`, `infra/deploy_aca.sh`), managed identity for keyless Foundry access, external ingress for SSE |
-| **Azure Container Registry** | Cloud image build (`az acr build`), or a local docker/podman build when `LOCAL_BUILD` is set (`infra/deploy_aca.sh`) |
-| **GitHub Copilot** | Copilot CLI (agent mode) wrote the narrator fallback test `test_narrator_commentary_uses_safe_line_after_failure` in `tests/test_agents.py` and ran the suite. The rest of the code was not written with Copilot |
+| **Azure AI Speech** | Neural text-to-speech for spoken commentary: `en-GB-RyanNeural`, `ar-JO-TaimNeural`, `es-ES-AlvaroNeural`, `fr-FR-HenriNeural`, `pt-BR-AntonioNeural` (`app/tts.py`, `POST /api/tts`). The key is stored as a Container Apps secret. If Speech is unavailable, the browser's own voice is used |
+| **Model Context Protocol** | `echo_mcp/`: stats and Verifier tools over stdio (`python -m echo_mcp`) and streamable HTTP (`/mcp/` on the live app). It is used by a Foundry Agent Framework agent (`MCPStreamableHTTPTool`, `scripts/foundry_mcp_demo.py`) and by GitHub Copilot CLI (`docs/mcp_copilot_cli_run.txt`) |
+| **Azure Container Registry** | Cloud image build (`az acr build`), a local docker/podman build, or a daemonless `crane` layer build (`LOCAL_BUILD=crane`, used for the live deploy because ACR Tasks are blocked on Azure for Students) (`infra/deploy_aca.sh`, `infra/crane_build.sh`) |
+| **GitHub Copilot** | Copilot CLI (agent mode) wrote `tests/test_verifier.py` (8 Verifier tests, including the rewrite loop with a fake LLM) and the narrator fallback test in `tests/test_agents.py`, and ran the suite. It was also used as an MCP client of the live Echo Pitch MCP server (`docs/mcp_copilot_cli_run.txt`). The rest of the code was not written with Copilot |
 | **GitHub Actions** | CI: tests, determinism check, Docker build and smoke test (`.github/workflows/ci.yml`) |
+
+## MCP server: stats + Verifier as tools
+
+Tools: `list_matches`, `get_match_stats(match_id, minute?)`, `get_key_moments(match_id, minute?)`, `get_event(match_id, event_id)`, `verify_commentary(match_id, text, minute?, event_id?)`.
+
+**GitHub Copilot CLI / VS Code** (remote, no install):
+
+```json
+{"mcpServers": {"echo-pitch": {"type": "http", "url": "https://echo-pitch-web.blackriver-a826d80e.uaenorth.azurecontainerapps.io/mcp/", "tools": ["*"]}}}
+```
+
+```bash
+copilot -p "Fact-check for EP-2026-002: 'Saltmarsh FC beat Brackenridge Town 4-1'" \
+  --additional-mcp-config @mcp.json --allow-tool=echo-pitch
+```
+
+Local over stdio: `{"type": "local", "command": "python", "args": ["-m", "echo_mcp"]}` from the repo root.
+
+**Microsoft Foundry agent (Agent Framework):**
+
+```python
+from agent_framework import Agent, MCPStreamableHTTPTool
+async with MCPStreamableHTTPTool(name="echo-pitch", url="https://echo-pitch-web.blackriver-a826d80e.uaenorth.azurecontainerapps.io/mcp/") as mcp:
+    agent = Agent(client=foundry_chat_client, tools=[mcp], instructions="You are a broadcast fact-checker.")
+    print((await agent.run("Fact-check: Saltmarsh FC won 4-1")).text)
+```
+
+This was run with gpt-5-mini (`scripts/foundry_mcp_demo.py`). The output is in `docs/mcp_foundry_agent_run.txt`.
+
+## Accessibility: spoken commentary and audio-first mode
+
+- **🔊 Audio** speaks key lines with the Azure AI Speech neural voice for the selected language.
+- **♿ Audio-first** (key `A`, or `?a11y=1`) speaks every line and moment card. It switches to high-contrast large text, hides the visual-only pitch and momentum chart, and announces lines through an ARIA live region. `Space` kicks off and `S` speaks the clock and score.
 
 ## Languages
 
@@ -225,9 +289,13 @@ Live test: `ECHO_FOUNDRY_IT=1 python -m pytest tests/test_foundry_integration.py
 | GET | `/api/matches`, `/api/matches/{id}/meta`, `/api/matches/{id}/events?upto=N` | data |
 | GET | `/api/matches/{id}/stats?upto=N` | full analytics snapshot |
 | POST | `/api/replays` `{match_id, speed 10–60, start_minute}` | start a replay |
-| GET | `/api/replays/{rid}/stream?persona=&lang=en\|ar\|es\|fr\|pt&club=&player=&from_now=` | SSE agent stream (spend guard may switch it to offline agents) |
+| GET | `/api/replays/{rid}/stream?persona=&lang=en\|ar\|es\|fr\|pt&club=&player=&from_now=&approval=` | SSE agent stream (spend guard may switch it to offline agents) |
 | GET | `/api/replays/{rid}/state` · DELETE `/api/replays/{rid}` | live state, stop |
-| GET | `/api/config`, `/api/health` | mode, liveness |
+| GET | `/api/config`, `/api/health` | mode, TTS engine, voices, liveness |
+| POST | `/api/verify` `{match_id, text, minute?, event_id?}` | fact-check any line (Verifier) |
+| POST | `/api/tts` `{text, lang}` | Azure AI Speech mp3 |
+| POST | `/api/replays/{rid}/decisions` `{ref, decision}` · GET `/api/replays/{rid}/audit` | producer approval, audit log |
+| POST | `/mcp/` | MCP (streamable HTTP) |
 
 ## Testing
 
@@ -235,7 +303,9 @@ Live test: `ECHO_FOUNDRY_IT=1 python -m pytest tests/test_foundry_integration.py
 LLM_MODE=offline python -m pytest -q
 ```
 
-68 tests pass offline. Two live Foundry tests stay skipped unless `ECHO_FOUNDRY_IT=1`:
+86 tests pass offline. Two live Foundry tests stay skipped unless `ECHO_FOUNDRY_IT=1`:
+- **verifier:** correct lines pass with evidence, wrong numbers, score pairs, roster players and invented names are rejected, Arabic-Indic digits are handled, a full run is verified, and the rewrite loop works with a fake LLM (`tests/test_verifier.py`, written with Copilot CLI); the eval's planted-error machinery (`tests/test_eval.py`);
+- **platform:** `/api/verify`, the MCP tools (direct, over HTTP, over stdio), producer decisions and the audit log, verified SSE streams, and the TTS endpoint (`tests/test_platform.py`);
 - **generator:** schema, time ordering, goals match the scoreline, realism ranges, determinism, ball continuity, unique names, the shot cap, the CLI;
 - **analytics:** bounds, monotonic xG, stoppage-time windows, momentum smoothing;
 - **agents:** all five languages (template coverage, offline runs, the language guard), persona differences, the overlay schema, retry and recovery, forced fallback, environment defaults, the Foundry code path with stand-in agents, LLM calls not blocking the replay, building the Foundry agents;
@@ -248,10 +318,12 @@ LLM_MODE=offline python -m pytest -q
 ```
 generator/   synthetic match generator (CLI: python -m generator)
 analytics/   deterministic stats + explainability (agent tools)
-agents/      config, Foundry/Agent Framework wiring, specialists, EN/AR/ES/FR/PT templates, orchestrator
-app/         FastAPI: data API, replay service, SSE stream, static UI
+agents/      config, Foundry/Agent Framework wiring, specialists, verifier, EN/AR/ES/FR/PT templates, orchestrator
+app/         FastAPI: data API, replay service, SSE stream, TTS, audit, MCP mount, static UI
+echo_mcp/    MCP server (stdio + streamable HTTP): stats + Verifier tools
+scripts/     eval_verifier.py (EVAL.md), e2e_live.py, foundry_eval.py, foundry_mcp_demo.py, screenshot.py
 web/         single-page broadcast UI (vanilla JS)
-infra/       Azure Container Apps deploy script
+infra/       Azure Container Apps deploy script, crane layer build
 docs/        architecture, demo video script, pitch, submission checklist, screenshots
 tests/       pytest suite
 ```

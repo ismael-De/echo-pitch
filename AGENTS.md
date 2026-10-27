@@ -45,7 +45,7 @@ uvicorn app.main:app --port 8000
 ```
 Tests (in the same activated venv):
 ```powershell
-$env:LLM_MODE="offline"; python -m pytest -q     # expect 68 passed, 2 skipped
+$env:LLM_MODE="offline"; python -m pytest -q     # expect 86 passed, 2 skipped
 ```
 Offline mode uses templates only and makes no Azure calls. Do **not** create a `.env` with `LLM_MODE=foundry` unless Ismael asks. Foundry mode needs `az login` and costs credit.
 Optional: `python -m generator --demo --out data/` regenerates the demo matches (they are already committed).
