@@ -38,6 +38,12 @@ STYLE = {
 }
 
 
+def _fb(feedback: str) -> str:
+    """Verifier feedback for the one allowed rewrite of a rejected draft."""
+    return (f" Your previous draft was rejected by the fact-check Verifier: {feedback}. Rewrite it using only the "
+            "numbers and names given above.") if feedback else ""
+
+
 class Base:
     name = "base"
 
@@ -60,10 +66,10 @@ class StatsAgent(Base):
     def snapshot(self, events: list[dict], meta: dict) -> dict:
         return A.match_state(events, meta)
 
-    async def insight(self, st: dict, ctx: dict, llm: bool = True) -> str:
+    async def insight(self, st: dict, ctx: dict, llm: bool = True, feedback: str = "") -> str:
         if llm and self.llm:
             return await self._llm(f"{_audience(ctx)} Current clock {st['clock']}. "
-                                   "Call get_live_stats and give one insight sentence.", ctx["lang"])
+                                   "Call get_live_stats and give one insight sentence." + _fb(feedback), ctx["lang"])
         return self.insight_template(st, ctx)
 
     def insight_template(self, st: dict, ctx: dict) -> str:
@@ -85,9 +91,10 @@ class MomentsAgent(Base):
     """Explains why a moment matters using game state, xG, momentum and control-vs-chaos context."""
     name = "moments"
 
-    async def explain(self, moment: dict, ctx: dict, llm: bool = True) -> str:
+    async def explain(self, moment: dict, ctx: dict, llm: bool = True, feedback: str = "") -> str:
         if llm and self.llm:
-            return await self._llm(f"{_audience(ctx)} Moment: {json.dumps(moment_facts(moment), ensure_ascii=False)}", ctx["lang"])
+            return await self._llm(f"{_audience(ctx)} Moment: {json.dumps(moment_facts(moment), ensure_ascii=False)}"
+                                   + _fb(feedback), ctx["lang"])
         return self.explain_template(moment, ctx)
 
     def explain_template(self, m: dict, ctx: dict) -> str:
@@ -141,10 +148,12 @@ class NarratorAgent(Base):
         super().__init__(llm_agent)
         self.recap_llm = recap_agent or llm_agent
 
-    async def line(self, key: str, vals: dict, ctx: dict, llm: bool = True, facts: dict | None = None) -> str:
+    async def line(self, key: str, vals: dict, ctx: dict, llm: bool = True, facts: dict | None = None,
+                   feedback: str = "") -> str:
         if llm and self.llm:
             f = facts or {k: v for k, v in vals.items() if k not in ("event_id",)}
-            return await self._llm(f"{_audience(ctx)} Event: {json.dumps(f, ensure_ascii=False)}", ctx["lang"])
+            return await self._llm(f"{_audience(ctx)} Event: {json.dumps(f, ensure_ascii=False)}" + _fb(feedback),
+                                   ctx["lang"])
         return self.line_template(key, vals, ctx)
 
     def line_template(self, key: str, vals: dict, ctx: dict) -> str:
@@ -156,7 +165,7 @@ class NarratorAgent(Base):
         return T.SAFE[ctx["lang"]].format(clock=vals.get("clock", ""), player=vals.get("player", ""),
                                           team=vals.get("team", ""), kind=kind)
 
-    async def recap(self, st: dict, meta: dict, ctx: dict, llm: bool = True) -> str:
+    async def recap(self, st: dict, meta: dict, ctx: dict, llm: bool = True, feedback: str = "") -> str:
         if llm and self.llm:
             slim = {k: st[k] for k in ("score", "xg", "possession_pct", "shots")}
             slim["key_moments"] = [{k: m.get(k) for k in ("clock", "kind", "team", "player", "xg", "xg_prevented")}
@@ -165,7 +174,7 @@ class NarratorAgent(Base):
             slim["teams"] = {"home": meta["home"]["name"], "away": meta["away"]["name"]}
             return await self._recap_llm(ctx["lang"], f"{_audience(ctx)} Write the full-time recap. "
                                    f"Teams: {meta['home']['name']} (home) v {meta['away']['name']} (away), venue "
-                                   f"{meta['venue']}. Stats: {json.dumps(slim, ensure_ascii=False)}")
+                                   f"{meta['venue']}. Stats: {json.dumps(slim, ensure_ascii=False)}" + _fb(feedback))
         return self.recap_template(st, meta, ctx)
 
     async def _recap_llm(self, lang: str, prompt: str) -> str:

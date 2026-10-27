@@ -15,6 +15,7 @@ import analytics as A
 
 from . import templates as T
 from .config import Settings
+from .verifier import Verifier
 from .specialists import MomentsAgent, NarratorAgent, PersonaAgent, StatsAgent, dist_to_goal
 
 Item = tuple[str, dict]
@@ -43,7 +44,7 @@ class MatchOrchestrator:
     STATS_EVERY = 25
 
     def __init__(self, meta: dict, prefs: Prefs | None = None, settings: Settings | None = None,
-                 llm_agents: dict | None = None):
+                 llm_agents: dict | None = None, approval: bool = False, audit: list | None = None):
         self.meta, self.prefs = meta, prefs or Prefs()
         self.settings = settings or Settings.from_env()
         if self.settings.mode == "foundry" and llm_agents is None:
@@ -54,6 +55,10 @@ class MatchOrchestrator:
         self.moments = MomentsAgent(llm_agents.get("moments"))
         self.narrator = NarratorAgent(llm_agents.get("narrator"), llm_agents.get("recap"))
         self.persona = PersonaAgent(llm_agents.get("persona"))
+        self.verifier = Verifier(meta)
+        self.approval = approval            # producer approval: LLM rewrites wait for a human OK in the UI
+        self.audit: list[dict] = audit if audit is not None else []
+        self.verify_stats = {"checked": 0, "passed": 0, "rejected": 0, "rewrites": 0, "fallbacks": 0}
         # ---- shared match state (the blackboard all agents read/write) ----
         self.events: list[dict] = []
         self.score = {"home": 0, "away": 0}
@@ -167,31 +172,97 @@ class MatchOrchestrator:
             f.update(player=v["player"], team=v["team"], zone=v["zone"])
         return f
 
+    # ------------------------------------------------------------ Verifier (Guard) agent
+    def _ctx_facts(self) -> dict:
+        return {"favourite_club": self.ctx.get("club_name"), "favourite_player": self.ctx.get("player_name")}
+
+    def _verify(self, text: str, facts: dict, task: str, out: list[Item], ref: str | None = None,
+                traced: bool = True, source: str = "llm", attempt: int = 1):
+        t0 = time.perf_counter()
+        v = self.verifier.check(text, {**facts, **self._ctx_facts()})
+        ms = round((time.perf_counter() - t0) * 1000, 2)
+        self.verify_stats["checked"] += 1
+        self.verify_stats["passed" if v.ok else "rejected"] += 1
+        clock = A.match_clock(self.events[-1]) if self.events else "0'"
+        self.audit.append({"ts": round(time.time(), 3), "clock": clock, "ref": ref, "task": task, "writer": source,
+                           "attempt": attempt, "verdict": "pass" if v.ok else "reject", "text": text,
+                           "problems": v.problems, "evidence": v.evidence})
+        if traced or not v.ok:
+            rec = {"agent": "verifier", "task": task, "status": "ok" if v.ok else "rejected", "attempts": attempt,
+                   "source": "deterministic", "latency_ms": ms, "error": "; ".join(v.problems) or None, "clock": clock,
+                   "checked": len(v.evidence) + len(v.problems)}
+            self.trace.append(rec)
+            out.append(("agent_trace", rec))
+        return v
+
+    async def _guarded(self, agent: str, task: str, write: Callable[[str], Awaitable[str]], facts,
+                       out: list[Item], ref: str, post: Callable[[str], Awaitable[str]] | None = None):
+        """Writer -> Verifier. A rejected draft goes back to the writer once with the problems; if the rewrite
+        is rejected too, the (already shown, verified) template line stays: returns (None, verdict)."""
+        feedback = ""
+        for attempt in (1, 2):
+            text, src = await self._invoke(agent, task if attempt == 1 else f"{task}.rewrite",
+                                           lambda: write(feedback), lambda: "", out)
+            if src != "llm" or not text:
+                return None, None
+            if post:
+                text = await post(text)
+            v = self._verify(text, facts() if callable(facts) else facts, task, out, ref=ref, attempt=attempt)
+            if v.ok:
+                return text, v
+            feedback = "; ".join(v.problems)
+            if attempt == 1:
+                self.verify_stats["rewrites"] += 1
+        self.verify_stats["fallbacks"] += 1
+        rec = {"agent": "verifier", "task": task, "status": "fallback", "attempts": 2, "source": "template_kept",
+               "latency_ms": 0, "error": feedback, "clock": A.match_clock(self.events[-1]) if self.events else "0'"}
+        self.trace.append(rec)
+        out.append(("agent_trace", rec))
+        return None, v
+
+    def _emit_update(self, out: list[Item], cid: str, text: str, v) -> None:
+        out.append(("commentary_update", {"id": cid, "text": text, "source": "llm", "verified": True,
+                                          "evidence": v.evidence, "pending": self.approval}))
+
     async def _upgrade_comment(self, cid: str, key: str, vals: dict, info: dict, facts: dict | None = None) -> None:
         out: list[Item] = []
-        text, src = await self._invoke("narrator", key, lambda: self.narrator.line(key, vals, self.ctx, facts=facts),
-                                       lambda: "", out)
-        if src == "llm" and text:
-            text = await self._persona_pass(text, info, out)
-            out.append(("commentary_update", {"id": cid, "text": text, "source": "llm"}))
+        facts = facts or {k: v for k, v in vals.items() if k != "event_id"}
+        text, v = await self._guarded("narrator", key,
+                                      lambda fb: self.narrator.line(key, vals, self.ctx, facts=facts, feedback=fb),
+                                      facts, out, cid, post=lambda t: self._persona_pass(t, info, out))
+        if text:
+            self._emit_update(out, cid, text, v)
         self._ready.extend(out)
 
     async def _upgrade_moment(self, card: dict, m: dict, info: dict) -> None:
         out: list[Item] = []
-        expl, src = await self._invoke("moments", m["kind"], lambda: self.moments.explain(m, self.ctx),
-                                       lambda: "", out)
-        if src == "llm" and expl:
-            expl = await self._persona_pass(expl, info, out)
-            card.update(why=expl, source="llm", update=True)
+        facts = self._moment_facts(m)
+        expl, v = await self._guarded("moments", m["kind"], lambda fb: self.moments.explain(m, self.ctx, feedback=fb),
+                                      facts, out, card["moment_id"], post=lambda t: self._persona_pass(t, info, out))
+        if expl:
+            card.update(why=expl, source="llm", update=True, verified=True, evidence=v.evidence,
+                        pending=self.approval)
             out.append(("moment_card", dict(card)))
         self._ready.extend(out)
 
     async def _upgrade_insight(self, cid: str, st: dict) -> None:
         out: list[Item] = []
-        text, src = await self._invoke("stats", "insight", lambda: self.stats.insight(st, self.ctx), lambda: "", out)
-        if src == "llm" and text:
-            out.append(("commentary_update", {"id": cid, "text": text, "source": "llm"}))
+        text, v = await self._guarded("stats", "insight", lambda fb: self.stats.insight(st, self.ctx, feedback=fb),
+                                      lambda: {"snapshot": self._insight_facts(st),
+                                               "live_tool": self._insight_facts(self._state_snapshot())}, out, cid)
+        if text:
+            self._emit_update(out, cid, text, v)
         self._ready.extend(out)
+
+    def _moment_facts(self, m: dict) -> dict:
+        from .specialists import moment_facts
+        return {"moment": m, "facts": moment_facts(m)}
+
+    def _insight_facts(self, st: dict) -> dict:
+        keep = ("clock", "score", "possession_pct", "shots", "shots_on_target", "xg", "passing", "fouls", "teams")
+        d = {k: st[k] for k in keep if k in st}
+        d["phase"] = st["control_vs_chaos"][-1]["label"] if st.get("control_vs_chaos") else None
+        return d
 
     async def _persona_pass(self, text: str, info: dict, out: list[Item]) -> str:
         """Persona context is already in the Narrator/Moments prompts; by default only the deterministic
@@ -254,9 +325,14 @@ class MatchOrchestrator:
                                      lambda: self.persona.safe(text, info, self.ctx), out,
                                      traced=important and not upgrade, source="template")
         cid = self._next_cid()
+        v = self._verify(text, vals, key, out, ref=cid, traced=important and not upgrade, source=src)
+        if not v.ok:  # never show an unverified line: fall back to the minimal safe line
+            text, src = self.narrator.safe_line(key, vals, self.ctx), "safe_template"
+            v = self._verify(text, vals, key, out, ref=cid, traced=False, source=src, attempt=2)
         out.append(("commentary", {"id": cid, "event_id": vals.get("event_id"), "clock": vals.get("clock", "0'"),
                                    "kind": key, "team": e["team"] if e else None, "text": text, "lang": self.prefs.lang,
-                                   "persona": self.prefs.persona, "source": src, "important": important}))
+                                   "persona": self.prefs.persona, "source": src, "important": important,
+                                   "verified": v.ok, "evidence": v.evidence}))
         if upgrade and src != "safe_template":
             self._spawn(self._upgrade_comment(cid, key, vals, info, self._facts(key, vals, e)))
 
@@ -284,11 +360,16 @@ class MatchOrchestrator:
         expl, _ = await self._invoke("persona", "shape_moment", lambda: self.persona.shape(expl, info, self.ctx, llm=False),
                                      lambda: self.persona.safe(expl, info, self.ctx), out, traced=not upgrade,
                                      source="template")
-        card = {"moment_id": f"m-{len(self.moment_log) + 1:03d}", "kind": m["kind"],
+        mid = f"m-{len(self.moment_log) + 1:03d}"
+        v = self._verify(expl, self._moment_facts(m), m["kind"], out, ref=mid, traced=not upgrade, source=src)
+        if not v.ok:
+            expl, src = self.moments.safe(m, self.ctx), "safe_template"
+            v = self._verify(expl, self._moment_facts(m), m["kind"], out, ref=mid, traced=False, source=src, attempt=2)
+        card = {"moment_id": mid, "kind": m["kind"],
                 "title": self.moments.title(m, self.prefs.lang), "clock": m["clock"], "minute": m["minute"],
                 "team": m.get("team"), "player": m.get("player"), "importance": m.get("importance"),
                 "why": expl, "source": src, "metrics": {k: m[k] for k in ("xg", "xg_prevented", "score_after") if k in m},
-                "lang": self.prefs.lang}
+                "lang": self.prefs.lang, "verified": v.ok, "evidence": v.evidence}
         self.moment_log.append(card)
         out.append(("moment_card", dict(card)))
         self._overlay(out, "moment_card", e, 10, {"title": card["title"], "text": expl, "team": card["team"]}, "lower_third")
@@ -298,7 +379,8 @@ class MatchOrchestrator:
     # ------------------------------------------------------------ public API
     async def start(self) -> list[Item]:
         out: list[Item] = []
-        vals = {"home": self.meta["home"]["name"], "away": self.meta["away"]["name"], "event_id": "kickoff"}
+        vals = {"home": self.meta["home"]["name"], "away": self.meta["away"]["name"], "event_id": "kickoff",
+                "formations": [self.meta["home"].get("formation"), self.meta["away"].get("formation")]}
         await self._comment(out, "kickoff", None, vals)
         if self.settings.warning:
             out.append(("agent_trace", {"agent": "orchestrator", "task": "config", "status": "warning",
@@ -380,11 +462,17 @@ class MatchOrchestrator:
             text, src = await self._invoke("stats", "insight", lambda: self.stats.insight(st, self.ctx, llm=False),
                                            lambda: self.stats.safe(st, self.ctx), out, source="template")
             cid = self._next_cid()
+            v = self._verify(text, self._insight_facts(st), "insight", out, ref=cid, traced=False, source=src)
+            if not v.ok:
+                text, src = self.stats.safe(st, self.ctx), "safe_template"
+                v = self._verify(text, self._insight_facts(st), "insight", out, ref=cid, traced=False, source=src,
+                                 attempt=2)
             if self.stats.llm is not None and src != "safe_template":
                 self._spawn(self._upgrade_insight(cid, st))
             out.append(("commentary", {"id": cid, "event_id": None, "clock": st["clock"], "kind": "insight", "team": None,
                                        "text": text, "lang": self.prefs.lang, "persona": self.prefs.persona,
-                                       "source": src, "important": False}))
+                                       "source": src, "important": False, "verified": v.ok,
+                                       "evidence": v.evidence}))
             self._overlay(out, "stat_bar", e, 10, {"possession": st["possession_pct"], "xg": st["xg"],
                                                    "shots": st["shots"]}, "lower_third")
         if len(self.events) % self.STATS_EVERY == 0:
@@ -471,11 +559,22 @@ class MatchOrchestrator:
         st = self._state_snapshot()
         potm = self.player_of_match(st)
         ctx = {**self.ctx, "potm": potm}
-        text, src = await self._invoke("narrator", "recap", lambda: self.narrator.recap(st, self.meta, ctx),
-                                       lambda: self.narrator.safe_recap(st, self.meta, ctx), out)
+        rfacts = {"stats": self._insight_facts(st), "key_moments": st["key_moments"], "potm": potm,
+                  "venue": self.meta["venue"]}
+        text, v = await self._guarded("narrator", "recap", lambda fb: self.narrator.recap(st, self.meta, ctx, feedback=fb),
+                                      rfacts, out, "recap") if self.narrator.recap_llm is not None else (None, None)
+        src = "llm"
+        if not text:
+            text, src = await self._invoke("narrator", "recap", lambda: self.narrator.recap(st, self.meta, ctx, llm=False),
+                                           lambda: self.narrator.safe_recap(st, self.meta, ctx), out, source="template")
+            v = self._verify(text, rfacts, "recap", out, ref="recap", source=src)
+            if not v.ok:
+                text, src = self.narrator.safe_recap(st, self.meta, ctx), "safe_template"
+                v = self._verify(text, rfacts, "recap", out, ref="recap", traced=False, source=src, attempt=2)
         out.append(("recap", {"text": text, "lang": self.prefs.lang, "persona": self.prefs.persona, "source": src,
                               "score": st["score"], "xg": st["xg"], "possession_pct": st["possession_pct"],
-                              "shots": st["shots"], "player_of_match": potm,
+                              "shots": st["shots"], "player_of_match": potm, "verified": v.ok, "evidence": v.evidence,
+                              "verifier": dict(self.verify_stats),
                               "moments": [{k: m[k] for k in ("clock", "kind", "title", "player", "team")}
                                           for m in self.moment_log]}))
         return out

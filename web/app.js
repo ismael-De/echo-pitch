@@ -1,35 +1,35 @@
 // Echo Pitch UI: vanilla JS, consumes the FastAPI SSE replay stream.
 const $ = (id) => document.getElementById(id);
 const I18N = {
-  en: {tagline:"AI match storyteller", match:"Match", speed:"Speed", fan:"Fan", analyst:"Analyst", club:"Club",
+  en: {audio:"Audio", a11y:"Audio-first", approval:"Producer", audit:"Audit", verified:"verified", approve:"Approve", reject:"Reject", pending:"AI draft awaiting producer", evidence:"Evidence", tagline:"AI match storyteller", match:"Match", speed:"Speed", fan:"Fan", analyst:"Analyst", club:"Club",
        player:"Player", none:"None", start:"▶ Kick off", restart:"↻ Restart", possession:"Possession", shots:"Shots",
        ontarget:"On target", passes:"Pass %", momentum:"Momentum", commentary:"Live commentary",
        moments:"Key moments · why they matter", agents:"Agents", fulltime:"Full-time recap", close:"Close",
        potm:"Player of the match", controlled:"controlled", contested:"contested", chaotic:"chaotic",
        "fast and direct":"fast & direct", "slow build-up":"slow build-up", steady:"steady", goal:"GOAL!",
        xg:"xG", difficulty:"Pass difficulty", speedAlert:"km/h", attacks:"attacks"},
-  ar: {tagline:"راوي المباريات بالذكاء الاصطناعي", match:"المباراة", speed:"السرعة", fan:"مشجّع", analyst:"محلّل",
+  ar: {audio:"الصوت", a11y:"وضع صوتي", approval:"المنتج", audit:"السجل", verified:"موثّق", approve:"موافقة", reject:"رفض", pending:"مسودة AI بانتظار المنتج", evidence:"الدليل", tagline:"راوي المباريات بالذكاء الاصطناعي", match:"المباراة", speed:"السرعة", fan:"مشجّع", analyst:"محلّل",
        club:"النادي", player:"اللاعب", none:"لا شيء", start:"▶ ابدأ", restart:"↻ إعادة", possession:"الاستحواذ",
        shots:"التسديدات", ontarget:"على المرمى", passes:"دقة التمرير", momentum:"الزخم", commentary:"التعليق المباشر",
        moments:"اللحظات الحاسمة · لماذا تهم", agents:"الوكلاء", fulltime:"ملخص المباراة", close:"إغلاق",
        potm:"أفضل لاعب", controlled:"منظّم", contested:"متكافئ", chaotic:"فوضوي", "fast and direct":"سريع ومباشر",
        "slow build-up":"بناء هادئ", steady:"متوازن", goal:"هدف!", xg:"xG", difficulty:"صعوبة التمريرة",
        speedAlert:"كم/س", attacks:"يهاجم"},
-  es: {tagline:"Narrador de partidos con IA", match:"Partido", speed:"Velocidad", fan:"Aficionado", analyst:"Analista",
+  es: {audio:"Audio", a11y:"Modo audio", approval:"Productor", audit:"Registro", verified:"verificado", approve:"Aprobar", reject:"Rechazar", pending:"Borrador IA pendiente", evidence:"Evidencia", tagline:"Narrador de partidos con IA", match:"Partido", speed:"Velocidad", fan:"Aficionado", analyst:"Analista",
        club:"Club", player:"Jugador", none:"Ninguno", start:"▶ Empezar", restart:"↻ Reiniciar", possession:"Posesión",
        shots:"Tiros", ontarget:"A puerta", passes:"% pases", momentum:"Impulso", commentary:"Comentario en directo",
        moments:"Momentos clave · por qué importan", agents:"Agentes", fulltime:"Resumen final", close:"Cerrar",
        potm:"Jugador del partido", controlled:"controlado", contested:"disputado", chaotic:"caótico",
        "fast and direct":"rápido y directo", "slow build-up":"elaboración lenta", steady:"estable", goal:"¡GOL!",
        xg:"xG", difficulty:"Dificultad del pase", speedAlert:"km/h", attacks:"ataca"},
-  fr: {tagline:"Le conteur de matchs IA", match:"Match", speed:"Vitesse", fan:"Supporter", analyst:"Analyste",
+  fr: {audio:"Audio", a11y:"Mode audio", approval:"Producteur", audit:"Journal", verified:"vérifié", approve:"Valider", reject:"Rejeter", pending:"Brouillon IA en attente", evidence:"Preuve", tagline:"Le conteur de matchs IA", match:"Match", speed:"Vitesse", fan:"Supporter", analyst:"Analyste",
        club:"Club", player:"Joueur", none:"Aucun", start:"▶ Coup d'envoi", restart:"↻ Rejouer", possession:"Possession",
        shots:"Tirs", ontarget:"Cadrés", passes:"% passes", momentum:"Dynamique", commentary:"Commentaire en direct",
        moments:"Moments clés · pourquoi ils comptent", agents:"Agents", fulltime:"Résumé du match", close:"Fermer",
        potm:"Homme du match", controlled:"maîtrisé", contested:"disputé", chaotic:"décousu",
        "fast and direct":"rapide et direct", "slow build-up":"construction lente", steady:"équilibré", goal:"BUT !",
        xg:"xG", difficulty:"Difficulté de passe", speedAlert:"km/h", attacks:"attaque"},
-  pt: {tagline:"Narrador de jogos com IA", match:"Jogo", speed:"Velocidade", fan:"Torcedor", analyst:"Analista",
+  pt: {audio:"Áudio", a11y:"Modo áudio", approval:"Produtor", audit:"Registro", verified:"verificado", approve:"Aprovar", reject:"Rejeitar", pending:"Rascunho IA aguardando", evidence:"Evidência", tagline:"Narrador de jogos com IA", match:"Jogo", speed:"Velocidade", fan:"Torcedor", analyst:"Analista",
        club:"Clube", player:"Jogador", none:"Nenhum", start:"▶ Começar", restart:"↻ Reiniciar", possession:"Posse",
        shots:"Finalizações", ontarget:"No alvo", passes:"% passes", momentum:"Momento", commentary:"Narração ao vivo",
        moments:"Lances decisivos · por que importam", agents:"Agentes", fulltime:"Resumo do jogo", close:"Fechar",
@@ -40,7 +40,8 @@ const I18N = {
 const qs = new URLSearchParams(location.search);
 const S = {persona: qs.get("persona") || "fan", lang: qs.get("lang") || "en", club: qs.get("club") || "",
            player: qs.get("player") || "", match: qs.get("match"), speed: +(qs.get("speed") || 30),
-           replay: null, es: null, meta: null, recent: [], momentum: []};
+           replay: null, es: null, meta: null, recent: [], momentum: [],
+           audio: qs.get("audio") === "1", a11y: qs.get("a11y") === "1", approval: qs.get("approval") === "1", vstats: {checked: 0, rejected: 0}};
 const t = (k) => (I18N[S.lang][k] ?? I18N.en[k] ?? k);
 
 function applyLang() {
@@ -94,13 +95,15 @@ async function start(startMinute = +(qs.get("start") || 0)) {
 }
 function reconnect() { if (S.replay) { if (S.es) S.es.close(); ["ticker", "cards", "overlays"].forEach((id) => ($(id).innerHTML = "")); connect(true); } }
 function connect(fromNow) {
-  const p = new URLSearchParams({persona: S.persona, lang: S.lang, from_now: fromNow});
+  const p = new URLSearchParams({persona: S.persona, lang: S.lang, from_now: fromNow, approval: S.approval});
+  $("auditLink").href = `/api/replays/${S.replay}/audit`;
   if (S.club) p.set("club", S.club); if (S.player) p.set("player", S.player);
   const es = new EventSource(`/api/replays/${S.replay}/stream?${p}`); S.es = es;
   const on = (name, fn) => es.addEventListener(name, (ev) => fn(JSON.parse(ev.data)));
   on("meta", (d) => { const b = $("modeBadge"); b.textContent = d.llm_mode === "foundry" ? "Azure AI Foundry" : "offline agents"; b.classList.toggle("foundry", d.llm_mode === "foundry"); });
   on("match_event", drawEvent); on("commentary", addLine); on("moment_card", addCard);
-  on("commentary_update", (u) => { const li = document.querySelector(`#ticker li[data-id="${u.id}"] .txt`); if (li) { li.classList.add("swap"); setTimeout(() => { li.innerHTML = bidi(u.text); li.nextSibling.textContent = u.source; li.classList.remove("swap"); li.closest("li").classList.add("upgraded"); }, 220); } }); on("overlay", showOverlay);
+  on("commentary_update", (u) => (u.pending ? pendingLine(u) : applyUpdate(u))); on("overlay", showOverlay);
+  on("verifier", (v) => { S.vstats = v; vchip(); });
   on("stats", updateStats); on("agent_trace", trace); on("recap", showRecap);
   on("end", () => es.close());
 }
@@ -128,20 +131,88 @@ function drawEvent(e) {
 function clockOf(e) { const m = e.minute; if (e.period === 1 && m >= 45) return `45+${m - 44}'`; if (e.period === 2 && m >= 90) return `90+${m - 89}'`; return `${m + 1}'`; }
 
 // ---------------------------------------------------------------- feed
+function evHtml(ev) {
+  if (!ev || !ev.length) return "";
+  return `<span class="ev-list">${t("evidence")}: ` + ev.map((x, i) => `<span class="fn"><sup>${i + 1}</sup><bdi>${esc(x.claim)}</bdi> ← <code>${esc(x.fact)}</code></span>`).join(" ") + "</span>";
+}
+function vbadge(d) {
+  if (d.verified === undefined) return "";
+  const tip = (d.evidence || []).map((x) => `${x.claim} ← ${x.fact} (${x.how})`).join("\n");
+  return `<button class="vbadge ${d.verified ? "ok" : "bad"}" title="${esc(tip)}" aria-label="${t("verified")}: ${esc(tip)}">🛡 ${d.verified ? t("verified") : "!"} ${(d.evidence || []).length ? `<sup>${d.evidence.length}</sup>` : ""}</button>`;
+}
 function addLine(d) {
   const li = document.createElement("li");
   li.className = `${d.team || ""} ${d.important ? "big" : ""}`; li.dataset.id = d.id || "";
-  li.innerHTML = `<span class="c">${d.clock}</span><span><span class="txt">${bidi(d.text)}</span><span class="src">${d.source}</span></span>`;
+  li.innerHTML = `<span class="c">${d.clock}</span><span><span class="txt">${bidi(d.text)}</span><span class="src">${d.source}</span>${vbadge(d)}<div class="evd hidden">${evHtml(d.evidence)}</div></span>`;
+  wireBadge(li);
   $("ticker").prepend(li);
   while ($("ticker").children.length > 40) $("ticker").lastChild.remove();
+  S.vstats.checked += 1; vchip();
+  if (S.a11y || (S.audio && d.important)) say(d.text, d.id);
 }
+function wireBadge(li) { const b = li.querySelector(".vbadge"); if (b) b.onclick = () => li.querySelector(".evd").classList.toggle("hidden"); }
+function applyUpdate(u) {
+  const li = document.querySelector(`#ticker li[data-id="${u.id}"]`); if (!li) return;
+  const tx = li.querySelector(".txt"); tx.classList.add("swap");
+  setTimeout(() => {
+    tx.innerHTML = bidi(u.text); li.querySelector(".src").textContent = u.source; tx.classList.remove("swap"); li.classList.add("upgraded");
+    const old = li.querySelector(".vbadge"); if (old) old.outerHTML = vbadge(u); li.querySelector(".evd").innerHTML = evHtml(u.evidence); wireBadge(li);
+    S.vstats.checked += 1; vchip();
+    if (S.audio || S.a11y) say(u.text, u.id, true);
+  }, 220);
+}
+function pendingLine(u) {
+  const li = document.querySelector(`#ticker li[data-id="${u.id}"]`); if (!li) return;
+  const box = document.createElement("div"); box.className = "pending";
+  box.innerHTML = `<div class="pl">🎬 ${t("pending")} ${vbadge(u)}</div><div class="pt">${bidi(u.text)}</div>
+    <button class="ap">✓ ${t("approve")}</button><button class="rj">✕ ${t("reject")}</button>`;
+  li.lastChild.appendChild(box);
+  const send = (decision) => fetch(`/api/replays/${S.replay}/decisions`, {method: "POST", headers: {"content-type": "application/json"},
+    body: JSON.stringify({ref: u.id, decision, text: u.text})});
+  box.querySelector(".ap").onclick = () => { send("approve"); box.remove(); applyUpdate({...u, pending: false}); };
+  box.querySelector(".rj").onclick = () => { send("reject"); box.remove(); };
+}
+function vchip() { $("verChip").textContent = `🛡 ${S.vstats.checked}${S.vstats.rejected ? ` · ✕ ${S.vstats.rejected}` : ""}`; }
+
+// ---------------------------------------------------------------- speech (Azure AI Speech, browser fallback)
+const VOICE_LANG = {en: "en-GB", ar: "ar-JO", es: "es-ES", fr: "fr-FR", pt: "pt-BR"};
+const SQ = {queue: [], busy: false, audio: new Audio(), spoken: new Set(), engine: null};
+function say(text, id, isUpdate) {
+  if (id && SQ.spoken.has(id) && !isUpdate) return;
+  if (isUpdate) { const q = SQ.queue.find((x) => x.id === id); if (q) { q.text = text; return; } if (SQ.spoken.has(id)) return; }
+  if (SQ.queue.length > 3) SQ.queue.splice(0, SQ.queue.length - 3); // keep up with the live match
+  SQ.queue.push({text, id, lang: S.lang}); pump();
+}
+async function pump() {
+  if (SQ.busy || !SQ.queue.length) return;
+  SQ.busy = true; const it = SQ.queue.shift(); if (it.id) SQ.spoken.add(it.id);
+  $("srLive").textContent = it.text;
+  try {
+    const r = await fetch("/api/tts", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify({text: it.text.slice(0, 400), lang: it.lang})});
+    if (!r.ok) throw new Error(r.status);
+    SQ.engine = "azure"; SQ.audio.src = URL.createObjectURL(await r.blob());
+    await new Promise((res) => { SQ.audio.onended = res; SQ.audio.onerror = res; SQ.audio.play().catch(res); });
+  } catch (e) {
+    SQ.engine = "browser";
+    if (window.speechSynthesis) await new Promise((res) => { const u = new SpeechSynthesisUtterance(it.text); u.lang = VOICE_LANG[it.lang]; u.onend = res; u.onerror = res; speechSynthesis.speak(u); });
+  }
+  SQ.busy = false; pump();
+}
+function setTog(id, on) { $(id).classList.toggle("on", on); $(id).setAttribute("aria-pressed", on); }
+function a11yMode(on) { S.a11y = on; document.body.classList.toggle("a11y", on); setTog("a11yBtn", on); $("ticker").setAttribute("aria-live", on ? "polite" : "off");
+  if (on) say(t("a11y") + ". " + (S.meta ? `${S.meta.home.name} v ${S.meta.away.name}` : "")); }
 function addCard(c) {
+  if (c.pending) { const o = document.querySelector(`#cards .card[data-id="${c.moment_id}"]`); if (o && !o.querySelector(".pending")) { const b = document.createElement("div"); b.className = "pending"; b.innerHTML = `<div class="pl">🎬 ${t("pending")}</div><div class="pt">${bidi(c.why)}</div><button class="ap">✓ ${t("approve")}</button><button class="rj">✕ ${t("reject")}</button>`; o.appendChild(b);
+    const send = (decision) => fetch(`/api/replays/${S.replay}/decisions`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify({ref: c.moment_id, decision, text: c.why})});
+    b.querySelector(".ap").onclick = () => { send("approve"); addCard({...c, pending: false}); }; b.querySelector(".rj").onclick = () => { send("reject"); b.remove(); }; } return; }
+  if (!c.update && (S.a11y || S.audio)) say(`${c.title}. ${c.player || ""}. ${c.why}`, c.moment_id);
   const old = document.querySelector(`#cards .card[data-id="${c.moment_id}"]`);
   const div = old || document.createElement("div");
   div.className = `card ${c.team || ""}`; div.dataset.id = c.moment_id;
   const name = c.team ? S.meta[c.team].code : "";
   div.innerHTML = `<div class="h"><span class="k">${esc(c.title)} · ${name}</span><span class="cl">${c.clock}</span></div>
-    <div><b>${esc(c.player || "")}</b></div><p>${esc(c.why)}</p><div class="imp"><i style="width:${Math.round((c.importance || 0) * 100)}%"></i></div>`;
+    <div><b>${esc(c.player || "")}</b> ${vbadge(c)}</div><p>${esc(c.why)}</p><div class="evd hidden">${evHtml(c.evidence)}</div><div class="imp"><i style="width:${Math.round((c.importance || 0) * 100)}%"></i></div>`;
+  wireBadge(div);
   if (!old) $("cards").prepend(div);
 }
 function bidi(s) { return esc(s).replace(/[A-Za-z0-9][A-Za-z0-9 .'\-]*[A-Za-z0-9]|[A-Za-z]/g, (m) => `<bdi>${m}</bdi>`); }
@@ -198,6 +269,7 @@ function drawMomentum(series) {
 function trace(r) {
   const el = $(`ag-${r.agent}`);
   if (el) { el.className = `agent ${r.status} active`; setTimeout(() => el.classList.remove("active"), 600); }
+  if (r.agent === "verifier" && r.status !== "ok") { S.vstats.rejected += r.status === "rejected" ? 1 : 0; vchip(); }
   $("trace").textContent = `${r.clock || ""} ${r.agent}.${r.task} → ${r.status}${r.attempts > 1 ? ` (${r.attempts} attempts)` : ""} · ${r.source || ""} · ${r.latency_ms ?? ""}ms`;
 }
 function showRecap(r) {
@@ -205,7 +277,9 @@ function showRecap(r) {
   $("recapText").textContent = r.text;
   $("recapMoments").innerHTML = r.moments.map((m) => `<span>${m.clock} ${esc(m.title)} ${esc(m.player || "")}</span>`).join("")
     + (r.player_of_match ? `<span>★ ${t("potm")}: ${esc(r.player_of_match.player)}</span>` : "");
+  if (r.verifier) $("recapMoments").innerHTML += `<span>🛡 Verifier: ${r.verifier.checked} checked · ${r.verifier.rejected} rejected · ${r.verifier.fallbacks} kept template</span>`;
   $("recap").classList.remove("hidden");
+  if (S.audio || S.a11y) say(r.text, "recap");
 }
 
 // ---------------------------------------------------------------- wiring
@@ -221,4 +295,12 @@ seg("personaSeg", "persona");
 if (!I18N[S.lang]) S.lang = "en";
 $("langSel").value = S.lang;
 $("langSel").onchange = (e) => { S.lang = e.target.value; applyLang(); reconnect(); };
+$("audioBtn").onclick = () => { S.audio = !S.audio; setTog("audioBtn", S.audio); if (!S.audio) { SQ.queue = []; SQ.audio.pause(); speechSynthesis?.cancel(); } };
+$("a11yBtn").onclick = () => a11yMode(!S.a11y);
+$("approvalBtn").onclick = () => { S.approval = !S.approval; setTog("approvalBtn", S.approval); reconnect(); };
+setTog("audioBtn", S.audio); setTog("approvalBtn", S.approval); if (S.a11y) a11yMode(true);
+document.addEventListener("keydown", (e) => { if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
+  if (e.key === "a" || e.key === "A") a11yMode(!S.a11y);
+  if (e.key === " " && S.a11y) { e.preventDefault(); start(0); }
+  if ((e.key === "s" || e.key === "S") && S.a11y) { const st = `${$("clock").textContent}. ${$("homeName").textContent} ${$("homeScore").textContent}, ${$("awayName").textContent} ${$("awayScore").textContent}.`; say(st); } });
 loadMatches().then(() => { if (qs.get("autoplay")) start(); });

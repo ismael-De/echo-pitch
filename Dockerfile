@@ -12,6 +12,7 @@ COPY generator/ generator/
 COPY analytics/ analytics/
 COPY agents/ agents/
 COPY app/ app/
+COPY echo_mcp/ echo_mcp/
 COPY web/ web/
 COPY data/ data/
 # Regenerate the curated demo matches if the data folder was not shipped

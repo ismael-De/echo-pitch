@@ -13,7 +13,9 @@ from functools import lru_cache
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, StreamingResponse
+from contextlib import asynccontextmanager
+
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -25,7 +27,20 @@ from analytics.stats import _bucket as A_bucket
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 DATA_DIR = Path(os.environ.get("ECHO_DATA_DIR", Path(__file__).resolve().parent.parent / "data"))
-app = FastAPI(title="Echo Pitch API", version="0.1.0")
+from echo_mcp import build_server  # noqa: E402
+from app import tts  # noqa: E402
+
+MCP = build_server(http=True)
+_MCP_APP = MCP.streamable_http_app()
+
+
+@asynccontextmanager
+async def _lifespan(_app):
+    async with MCP.session_manager.run():
+        yield
+
+
+app = FastAPI(title="Echo Pitch API", version="0.2.0", lifespan=_lifespan)
 
 
 # ------------------------------------------------------------------ data access
@@ -61,6 +76,7 @@ class Replay:
                  if e["minute"] >= start_minute and (e["period"] == 2 or start_minute < 45)]
         self.offset = (min(cands) if cands else self.t[-1]) if start_minute else 0.0
         self.started = time.monotonic()
+        self.audit: list[dict] = []   # Verifier verdicts + producer decisions (enterprise audit log)
 
     def game_time(self) -> float:
         return self.offset + (time.monotonic() - self.started) * self.speed
@@ -152,7 +168,70 @@ def delete_replay(rid: str):
 def config():
     st = Settings.from_env()
     return {"llm_mode": st.mode, "model": st.model if st.mode == "foundry" else None, "warning": st.warning,
-            "speeds": [10, 20, 30, 45, 60]}
+            "speeds": [10, 20, 30, 45, 60], "tts": "azure_speech" if tts.configured() else "browser",
+            "voices": {k: v[1] for k, v in tts.VOICES.items()}, "mcp": "/mcp/"}
+
+
+class Decision(BaseModel):
+    ref: str = Field(..., max_length=40, description="commentary id or moment id")
+    decision: str = Field(..., pattern="^(approve|reject)$")
+    text: str | None = Field(None, max_length=1200)
+    producer: str = Field("producer", max_length=40)
+
+
+@app.post("/api/replays/{rid}/decisions", status_code=201)
+def producer_decision(rid: str, d: Decision):
+    """Producer approval mode: record a human approve/reject of an LLM line in the audit log."""
+    r = _replay(rid)
+    rec = {"ts": round(time.time(), 3), "ref": d.ref, "task": "producer", "writer": d.producer,
+           "verdict": d.decision, "text": d.text}
+    r.audit.append(rec)
+    return rec
+
+
+@app.get("/api/replays/{rid}/audit")
+def audit_log(rid: str, limit: int = Query(500, ge=1, le=5000)):
+    """Audit log: every Verifier verdict (with evidence/problems) and every producer decision, oldest first."""
+    r = _replay(rid)
+    v = [a for a in r.audit if a["task"] != "producer"]
+    return {"replay_id": rid, "entries": r.audit[-limit:], "total": len(r.audit),
+            "summary": {"verifier_checks": len(v), "verifier_rejects": sum(a["verdict"] == "reject" for a in v),
+                        "producer_approved": sum(a["verdict"] == "approve" for a in r.audit),
+                        "producer_rejected": sum(a["verdict"] == "reject" and a["task"] == "producer" for a in r.audit)}}
+
+
+class VerifyRequest(BaseModel):
+    match_id: str
+    text: str = Field(..., max_length=1200)
+    minute: int | None = Field(None, ge=0, le=130)
+    event_id: str | None = None
+
+
+@app.post("/api/verify")
+def verify(req: VerifyRequest):
+    """Fact-check any line against the match (same Verifier as the live pipeline and the MCP tool)."""
+    from echo_mcp.server import verify_commentary
+    try:
+        return verify_commentary(req.match_id, req.text, req.minute, req.event_id)
+    except ValueError as ex:
+        raise HTTPException(404, str(ex))
+
+
+class TTSRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=tts.MAX_CHARS)
+    lang: str = Field("en", pattern="^(en|ar|es|fr|pt)$")
+
+
+@app.post("/api/tts")
+async def speak(req: TTSRequest):
+    """Azure AI Speech neural voice (mp3). 503 when Speech is not configured: the UI then uses the browser voice."""
+    if not tts.configured():
+        raise HTTPException(503, "Azure Speech not configured")
+    try:
+        audio = await tts.synthesize(req.text, req.lang)
+    except Exception as ex:  # noqa: BLE001 - quota / network: tell the UI to fall back
+        raise HTTPException(502, f"speech failed: {type(ex).__name__}")
+    return Response(audio, media_type="audio/mpeg", headers={"X-Voice": tts.VOICES[req.lang][1]})
 
 
 @app.get("/api/replays/{rid}/stream")
@@ -160,7 +239,8 @@ async def replay_stream(request: Request, rid: str, stats_every: int = Query(25,
                         persona: str = Query("fan", pattern="^(fan|analyst)$"),
                         lang: str = Query("en", pattern="^(en|ar|es|fr|pt)$"),
                         club: str | None = Query(None, pattern="^(home|away)$"),
-                        player: str | None = None, from_now: bool = False, agents: bool = True):
+                        player: str | None = None, from_now: bool = False, agents: bool = True,
+                        approval: bool = False):
     """SSE stream for one viewer.
 
     Events: `meta`, `match_event` (raw), `commentary`, `moment_card`, `overlay`, `stats`, `agent_trace`,
@@ -178,7 +258,8 @@ async def replay_stream(request: Request, rid: str, stats_every: int = Query(25,
 
     async def gen():
         sent = r.position() if from_now else sum(1 for t in r.t if t < r.offset)
-        orch = MatchOrchestrator(r.meta, Prefs(persona, lang, club, player), settings) if agents else None
+        orch = MatchOrchestrator(r.meta, Prefs(persona, lang, club, player), settings, approval=approval,
+                                 audit=r.audit) if agents else None
         if orch:
             for e in r.events[:sent]:  # warm the shared state silently when joining mid-match
                 orch.events.append(e)
@@ -216,6 +297,8 @@ async def replay_stream(request: Request, rid: str, stats_every: int = Query(25,
         if orch:
             for name, data in await orch.finish():
                 yield _sse(name, data)
+        if orch:
+            yield _sse("verifier", dict(orch.verify_stats))
         if orch and orch.uses_llm:
             yield _sse("usage", orch.usage())
         yield _sse("end", {"final_score": r.meta["final_score"]})
@@ -238,6 +321,8 @@ async def replay_stream(request: Request, rid: str, stats_every: int = Query(25,
 def index():
     return FileResponse(WEB_DIR / "index.html")
 
+
+app.mount("/mcp", _MCP_APP)
 
 if WEB_DIR.exists():
     app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")

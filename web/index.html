@@ -17,6 +17,12 @@
     <label><span data-i18n="club">Club</span><select id="clubSel"><option value="" data-i18n="none">None</option></select></label>
     <label><span data-i18n="player">Player</span><select id="playerSel"><option value="" data-i18n="none">None</option></select></label>
     <button id="startBtn" class="primary" data-i18n="start">▶ Kick off</button>
+    <div class="toggles" role="group" aria-label="Modes">
+      <button id="audioBtn" class="tog" aria-pressed="false" title="Spoken commentary (Azure AI Speech neural voices)">🔊 <span data-i18n="audio">Audio</span></button>
+      <button id="a11yBtn" class="tog" aria-pressed="false" title="Audio-first accessible mode for blind and low-vision fans (key: A)">♿ <span data-i18n="a11y">Audio-first</span></button>
+      <button id="approvalBtn" class="tog" aria-pressed="false" title="Producer approval: AI rewrites wait for a human OK">🎬 <span data-i18n="approval">Producer</span></button>
+      <a id="auditLink" class="tog" target="_blank" rel="noopener" title="Audit log (JSON)">📜 <span data-i18n="audit">Audit</span></a>
+    </div>
     <span id="modeBadge" class="badge">offline</span>
   </div>
 </header>
@@ -65,7 +71,8 @@
     </div>
   </section>
   <section class="right">
-    <div class="panel feed"><h3 data-i18n="commentary">Live commentary</h3><ol id="ticker"></ol></div>
+    <div class="panel feed"><h3><span data-i18n="commentary">Live commentary</span> <span id="verChip" class="vchip" title="Verifier: lines checked / rejected">✓ 0</span></h3><ol id="ticker" aria-live="off"></ol></div>
+    <div id="srLive" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
     <div class="panel moments"><h3 data-i18n="moments">Key moments · why they matter</h3><div id="cards"></div></div>
   </section>
 </main>
@@ -74,7 +81,8 @@
   <span class="agent" id="ag-stats">Stats</span><span class="arrow">→</span>
   <span class="agent" id="ag-moments">Moments</span><span class="arrow">→</span>
   <span class="agent" id="ag-narrator">Narrator</span><span class="arrow">→</span>
-  <span class="agent" id="ag-persona">Persona</span>
+  <span class="agent" id="ag-persona">Persona</span><span class="arrow">→</span>
+  <span class="agent" id="ag-verifier" title="Deterministic fact-check of every number and name before it is shown">🛡 Verifier</span>
   <div id="trace"></div>
 </footer>
 
