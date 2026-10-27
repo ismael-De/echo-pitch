@@ -60,6 +60,7 @@ class Budget:
 
 
 def client_id(headers, host: str | None) -> str:
-    """First X-Forwarded-For hop (set by the Container Apps ingress), else the socket peer."""
-    fwd = headers.get("x-forwarded-for", "")
-    return fwd.split(",")[0].strip() or (host or "unknown")
+    """Last X-Forwarded-For hop: the address the Container Apps ingress itself appended. Earlier hops are
+    client-supplied and spoofable, so trusting them would let anyone dodge the per-visitor limits."""
+    fwd = [h.strip() for h in headers.get("x-forwarded-for", "").split(",") if h.strip()]
+    return fwd[-1] if fwd else (host or "unknown")

@@ -121,7 +121,26 @@ def test_budget_limits_and_release():
     assert b.acquire("a", 3700 + 86400)[0]  # next day, hour window expired
 
 
-def test_client_id_prefers_forwarded_for():
+def test_client_id_uses_ingress_appended_hop():
     from app.budget import client_id
-    assert client_id({"x-forwarded-for": "1.2.3.4, 10.0.0.1"}, "10.0.0.1") == "1.2.3.4"
+    assert client_id({"x-forwarded-for": "6.6.6.6, 1.2.3.4"}, "10.0.0.1") == "1.2.3.4"  # spoofed first hop ignored
     assert client_id({}, "9.9.9.9") == "9.9.9.9"
+
+
+def test_match_id_path_traversal_rejected(client):
+    r = client.post("/api/replays", json={"match_id": "../../etc/passwd"})
+    assert r.status_code == 404 and "Traceback" not in r.text
+
+
+def test_tts_rate_limited(client, monkeypatch):
+    from app import main
+    monkeypatch.setattr(main, "TTS_RL", main.RateLimit(2, 60))
+    monkeypatch.setattr(main.tts, "configured", lambda: False)
+    codes = [client.post("/api/tts", json={"text": "hi"}).status_code for _ in range(3)]
+    assert codes == [503, 503, 429]
+
+
+def test_security_headers_on_index(client):
+    r = client.get("/")
+    assert "frame-ancestors 'none'" in r.headers["content-security-policy"]
+    assert r.headers["x-content-type-options"] == "nosniff"

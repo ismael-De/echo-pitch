@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Echo Pitch · AI Match Storyteller</title>
+<meta name="description" content="Echo Pitch: a multi-agent AI match storyteller with a fact-checking Verifier, spoken commentary in 5 languages and a producer approval log.">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2728%27 fill=%27%2334d399%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2712%27 fill=%27%230b1020%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -18,14 +21,15 @@
     <label><span data-i18n="player">Player</span><select id="playerSel"><option value="" data-i18n="none">None</option></select></label>
     <button id="startBtn" class="primary" data-i18n="start">▶ Kick off</button>
     <div class="toggles" role="group" aria-label="Modes">
-      <button id="audioBtn" class="tog" aria-pressed="false" title="Spoken commentary (Azure AI Speech neural voices)">🔊 <span data-i18n="audio">Audio</span></button>
-      <button id="a11yBtn" class="tog" aria-pressed="false" title="Audio-first accessible mode for blind and low-vision fans (key: A)">♿ <span data-i18n="a11y">Audio-first</span></button>
-      <button id="approvalBtn" class="tog" aria-pressed="false" title="Producer approval: AI rewrites wait for a human OK">🎬 <span data-i18n="approval">Producer</span></button>
-      <button id="auditBtn" class="tog" type="button" aria-haspopup="dialog">📜 <span data-i18n="audit">Audit</span></button>
+      <button id="audioBtn" class="tog" aria-pressed="false" data-i18n-title="tAudio" title="Spoken commentary (Azure AI Speech neural voices)">🔊 <span data-i18n="audio">Audio</span></button>
+      <button id="a11yBtn" class="tog" aria-pressed="false" data-i18n-title="tA11y" title="Audio-first accessible mode for blind and low-vision fans (key: A)">♿ <span data-i18n="a11y">Audio-first</span></button>
+      <button id="approvalBtn" class="tog" aria-pressed="false" data-i18n-title="tProd" title="Producer approval: AI rewrites wait for a human OK">🎬 <span data-i18n="approval">Producer</span></button>
+      <button id="auditBtn" class="tog" type="button" data-i18n-title="tAudit" title="Audit log" aria-haspopup="dialog">📜 <span data-i18n="audit">Audit</span></button>
     </div>
     <span id="modeBadge" class="badge">offline</span>
   </div>
 </header>
+<div id="howto" class="howto" role="note"><span data-i18n="howto">How to try: press ▶ Kick off, turn on 🔊 Audio, switch 🌐 language any time, open 🎬 Producer to approve AI lines and 📜 Audit to see every check.</span><button id="howtoX" type="button" class="audit-x" data-i18n-aria="close" aria-label="Close">✕</button></div>
 
 <section class="scoreboard">
   <div class="team home"><span class="swatch"></span><span id="homeName">Home</span></div>

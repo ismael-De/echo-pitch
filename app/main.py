@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import os
 import time
 import uuid
@@ -44,8 +45,32 @@ app = FastAPI(title="Echo Pitch API", version="0.2.0", lifespan=_lifespan)
 
 
 # ------------------------------------------------------------------ data access
+MATCH_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+
+
+class RateLimit:
+    """Tiny per-client sliding-window limiter (in-memory; one replica). Stops /api/tts being a free speech API
+    and stops scripted replay creation from evicting other visitors' sessions."""
+    def __init__(self, n: int, per: float):
+        self.n, self.per, self.hits = n, per, {}
+
+    def check(self, request: Request):
+        now, key = time.monotonic(), client_id(request.headers, request.client.host if request.client else None)
+        q = [t for t in self.hits.get(key, []) if now - t < self.per]
+        if len(q) >= self.n:
+            raise HTTPException(429, "rate limit: slow down", headers={"Retry-After": str(int(self.per))})
+        q.append(now); self.hits[key] = q
+        if len(self.hits) > 5000:
+            self.hits.clear()
+
+
+TTS_RL, REPLAY_RL, VERIFY_RL = RateLimit(90, 60), RateLimit(20, 60), RateLimit(60, 60)
+
+
 @lru_cache(maxsize=32)
 def _load(match_id: str) -> tuple[dict, list[dict]]:
+    if not MATCH_RE.match(match_id):
+        raise HTTPException(404, "unknown match")
     meta_p, ev_p = DATA_DIR / f"{match_id}_meta.json", DATA_DIR / f"{match_id}_events.jsonl"
     if not meta_p.exists() or not ev_p.exists():
         raise HTTPException(404, f"unknown match {match_id}")
@@ -139,7 +164,8 @@ def get_stats(match_id: str, upto: int | None = Query(None, ge=0, description="s
 
 
 @app.post("/api/replays", status_code=201)
-def create_replay(req: ReplayRequest):
+def create_replay(req: ReplayRequest, request: Request):
+    REPLAY_RL.check(request)
     r = Replay(req.match_id, req.speed, req.start_minute)
     while len(REPLAYS) >= BUDGET.max_replays:  # dicts keep insertion order: evict the oldest
         REPLAYS.pop(next(iter(REPLAYS)))
@@ -208,7 +234,8 @@ class VerifyRequest(BaseModel):
 
 
 @app.post("/api/verify")
-def verify(req: VerifyRequest):
+def verify(req: VerifyRequest, request: Request):
+    VERIFY_RL.check(request)
     """Fact-check any line against the match (same Verifier as the live pipeline and the MCP tool)."""
     from echo_mcp.server import verify_commentary
     try:
@@ -224,8 +251,9 @@ class TTSRequest(BaseModel):
 
 
 @app.post("/api/tts")
-async def speak(req: TTSRequest):
+async def speak(req: TTSRequest, request: Request):
     """Azure AI Speech neural voice (mp3). 503 when Speech is not configured: the UI then uses the browser voice."""
+    TTS_RL.check(request)
     if not tts.configured():
         raise HTTPException(503, "Azure Speech not configured")
     try:
@@ -336,6 +364,11 @@ async def no_cache_static(request, call_next):
     resp = await call_next(request)
     if request.url.path.startswith("/static/"):
         resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    if not request.url.path.startswith(("/mcp", "/docs", "/redoc")):
+        resp.headers.setdefault("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; media-src 'self' blob: data:; "
+                                "style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'")
     return resp
 
 
