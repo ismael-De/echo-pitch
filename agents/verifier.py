@@ -14,6 +14,7 @@ from typing import Any
 _AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩٫", "0123456789.")
 _NUM = re.compile(r"(?<![A-Za-z])\d+(?:\.\d+)?")
 _CAP2 = re.compile(r"\b([A-Z][a-z'\-]+(?:\s+[A-Z][a-z'\-]+)+)\b")
+_DEC_COMMA = re.compile(r"(?<!\d)(\d{1,3}),(\d{1,3})(?!\d)")
 _ALWAYS = {100.0}  # scales such as "65.6/100" or "58 times in 100"
 
 
@@ -70,6 +71,7 @@ class Verifier:
     def __init__(self, meta: dict):
         self.players = sorted({p["name"] for s in ("home", "away") for p in meta[s]["lineup"]}, key=len, reverse=True)
         self.teams = [meta[s]["name"] for s in ("home", "away")]
+        self.codes = [meta[s]["code"] for s in ("home", "away") if meta[s].get("code")]
         self.known_caps = set(self.players) | set(self.teams) | {meta.get("venue", "")}
 
     @staticmethod
@@ -104,11 +106,15 @@ class Verifier:
         for p, v in flat:
             nums += _numbers_of(p, v)
         ev, bad = [], []
-        t = text.translate(_AR_DIGITS)
+        t = _DEC_COMMA.sub(r"\1.\2", text.translate(_AR_DIGITS))  # "0,54" (fr/es/pt) -> "0.54"
         pairs = self._pairs(flat)
         for m in _PAIR.finditer(t):
             a, b = float(m.group(1)), float(m.group(2))
-            hit = next((p for p in pairs if (abs(p[0] - a) < 0.006 and abs(p[1] - b) < 0.006)
+            before, after = t[:m.start()].rstrip(), t[m.end():].lstrip()
+            is_score = "." not in m.group(0) and any(before.endswith(c) or after.startswith(c)
+                                                      for c in self.codes + self.teams)  # "SHF 1-0 BRT"
+            cand = [p for p in pairs if "score" in p[2]] if is_score and any("score" in p[2] for p in pairs) else pairs
+            hit = next((p for p in cand if (abs(p[0] - a) < 0.006 and abs(p[1] - b) < 0.006)
                         or (abs(p[0] - b) < 0.006 and abs(p[1] - a) < 0.006)), None)
             if hit:
                 ev.append({"claim": m.group(0).strip(), "fact": hit[2], "how": "pair"})

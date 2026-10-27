@@ -1,0 +1,398 @@
+{
+ "generated_at": "2026-10-27T19:31:21+0300",
+ "offline_templates": {
+  "lines": 3200,
+  "clean_pass": 3200,
+  "planted": {
+   "wrong_player": {
+    "planted": 2670,
+    "caught": 2670
+   },
+   "invented_player": {
+    "planted": 2670,
+    "caught": 2670
+   },
+   "swapped_team": {
+    "planted": 720,
+    "caught": 0
+   },
+   "wrong_number": {
+    "planted": 1335,
+    "caught": 1335
+   },
+   "wrong_score_pair": {
+    "planted": 330,
+    "caught": 330
+   }
+  },
+  "examples_missed": [
+   {
+    "kind": "swapped_team",
+    "text": "Luca Quarry wins it back for Avonmere Rovers!"
+   },
+   {
+    "kind": "swapped_team",
+    "text": "Viktor Marlow wins it back for Avonmere Rovers!"
+   },
+   {
+    "kind": "swapped_team",
+    "text": "Avonmere Rovers are on top right now with 54% of the ball."
+   },
+   {
+    "kind": "swapped_team",
+    "text": "Viktor Marlow wins it back for Avonmere Rovers!"
+   },
+   {
+    "kind": "swapped_team",
+    "text": "Coldwater Athletic turned up the press (47.3 vs a match average of 23.9). This period had 18 turnovers and the game felt chaotic."
+   },
+   {
+    "kind": "swapped_team",
+    "text": "Coldwater Athletic are on top right now with 53% of the ball."
+   }
+  ],
+  "planted_total": 7725,
+  "caught_total": 7005,
+  "caught_excl_team_swap": [
+   7005,
+   7005
+  ],
+  "verifier_latency_us": {
+   "p50": 120.6,
+   "p95": 213.0,
+   "max": 1079.7
+  },
+  "by_language": {
+   "en": {
+    "lines": 640,
+    "clean_pass": 640
+   },
+   "ar": {
+    "lines": 640,
+    "clean_pass": 640
+   },
+   "es": {
+    "lines": 640,
+    "clean_pass": 640
+   },
+   "fr": {
+    "lines": 640,
+    "clean_pass": 640
+   },
+   "pt": {
+    "lines": 640,
+    "clean_pass": 640
+   }
+  }
+ },
+ "foundry_llm": {
+  "match": "EP-2026-002",
+  "events": 1819,
+  "model": "gpt-5-mini",
+  "runs": [
+   {
+    "lang": "en",
+    "wall_s": 10.7,
+    "llm_drafts": 35,
+    "first_draft_pass": 35,
+    "rewrites": 0,
+    "rewrite_pass": 0,
+    "kept_template": 0,
+    "llm_lines_shown": 34,
+    "shown_unverified": 0,
+    "rejections": [],
+    "llm_latency_ms": {
+     "p50": 3959.9,
+     "p95": 6183.3,
+     "n": 35
+    },
+    "planted_on_llm_lines": {
+     "planted": {
+      "wrong_score_pair": {
+       "planted": 22,
+       "caught": 20
+      },
+      "wrong_number": {
+       "planted": 35,
+       "caught": 35
+      },
+      "wrong_player": {
+       "planted": 20,
+       "caught": 20
+      },
+      "invented_player": {
+       "planted": 20,
+       "caught": 20
+      },
+      "swapped_team": {
+       "planted": 17,
+       "caught": 0
+      }
+     },
+     "planted_total": 114,
+     "caught_total": 95,
+     "caught_excl_team_swap": [
+      95,
+      97
+     ]
+    },
+    "groundedness_judge": {
+     "mean": 4.97,
+     "n": 35,
+     "distribution": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 1,
+      "5": 34
+     }
+    }
+   },
+   {
+    "lang": "ar",
+    "wall_s": 10.8,
+    "llm_drafts": 35,
+    "first_draft_pass": 35,
+    "rewrites": 0,
+    "rewrite_pass": 0,
+    "kept_template": 0,
+    "llm_lines_shown": 34,
+    "shown_unverified": 0,
+    "rejections": [],
+    "llm_latency_ms": {
+     "p50": 3900.2,
+     "p95": 5672.1,
+     "n": 35
+    },
+    "planted_on_llm_lines": {
+     "planted": {
+      "wrong_score_pair": {
+       "planted": 24,
+       "caught": 23
+      },
+      "wrong_number": {
+       "planted": 34,
+       "caught": 34
+      },
+      "wrong_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "invented_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "swapped_team": {
+       "planted": 17,
+       "caught": 0
+      }
+     },
+     "planted_total": 117,
+     "caught_total": 99,
+     "caught_excl_team_swap": [
+      99,
+      100
+     ]
+    },
+    "groundedness_judge": {
+     "mean": 4.97,
+     "n": 35,
+     "distribution": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 1,
+      "5": 34
+     }
+    }
+   },
+   {
+    "lang": "es",
+    "wall_s": 11.0,
+    "llm_drafts": 35,
+    "first_draft_pass": 33,
+    "rewrites": 2,
+    "rewrite_pass": 2,
+    "kept_template": 0,
+    "llm_lines_shown": 34,
+    "shown_unverified": 0,
+    "rejections": [
+     {
+      "text": "Importante porque rompe un periodo igualado a falta de 4 minutos, da a Saltmarsh FC la ventaja decisiva y proviene de una ocasión de calidad: xG 0.441 indica buena probabilidad de gol, cambiando control del partido hacia Saltmarsh FC en el tramo final.",
+      "problems": [
+       "number 4 is not in the match facts"
+      ]
+     },
+     {
+      "text": "A los 2', Pavel Zeller evita el 0-1 para Saltmarsh FC con una parada decisiva que mantiene el marcador nivelado; la ocasión tenía un xG de 0.542, así que fue una intervención que neutralizó una gran probabilidad de gol y cortó cualquier impulso temprano del rival.",
+      "problems": [
+       "pair 0-1 does not match any score or stat pair"
+      ]
+     }
+    ],
+    "llm_latency_ms": {
+     "p50": 3852.0,
+     "p95": 5240.0,
+     "n": 37
+    },
+    "planted_on_llm_lines": {
+     "planted": {
+      "wrong_number": {
+       "planted": 35,
+       "caught": 35
+      },
+      "wrong_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "invented_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "swapped_team": {
+       "planted": 20,
+       "caught": 0
+      },
+      "wrong_score_pair": {
+       "planted": 20,
+       "caught": 20
+      }
+     },
+     "planted_total": 117,
+     "caught_total": 97,
+     "caught_excl_team_swap": [
+      97,
+      97
+     ]
+    },
+    "groundedness_judge": {
+     "mean": 4.86,
+     "n": 35,
+     "distribution": {
+      "1": 0,
+      "2": 1,
+      "3": 0,
+      "4": 2,
+      "5": 32
+     }
+    }
+   },
+   {
+    "lang": "fr",
+    "wall_s": 11.0,
+    "llm_drafts": 35,
+    "first_draft_pass": 35,
+    "rewrites": 0,
+    "rewrite_pass": 0,
+    "kept_template": 0,
+    "llm_lines_shown": 34,
+    "shown_unverified": 0,
+    "rejections": [],
+    "llm_latency_ms": {
+     "p50": 3820.9,
+     "p95": 6077.1,
+     "n": 35
+    },
+    "planted_on_llm_lines": {
+     "planted": {
+      "wrong_number": {
+       "planted": 35,
+       "caught": 34
+      },
+      "wrong_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "invented_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "swapped_team": {
+       "planted": 14,
+       "caught": 0
+      },
+      "wrong_score_pair": {
+       "planted": 13,
+       "caught": 13
+      }
+     },
+     "planted_total": 104,
+     "caught_total": 89,
+     "caught_excl_team_swap": [
+      89,
+      90
+     ]
+    },
+    "groundedness_judge": {
+     "mean": 4.46,
+     "n": 35,
+     "distribution": {
+      "1": 0,
+      "2": 2,
+      "3": 4,
+      "4": 5,
+      "5": 24
+     }
+    }
+   },
+   {
+    "lang": "pt",
+    "wall_s": 11.1,
+    "llm_drafts": 35,
+    "first_draft_pass": 35,
+    "rewrites": 0,
+    "rewrite_pass": 0,
+    "kept_template": 0,
+    "llm_lines_shown": 34,
+    "shown_unverified": 0,
+    "rejections": [],
+    "llm_latency_ms": {
+     "p50": 3755.4,
+     "p95": 6886.8,
+     "n": 35
+    },
+    "planted_on_llm_lines": {
+     "planted": {
+      "wrong_number": {
+       "planted": 35,
+       "caught": 35
+      },
+      "wrong_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "invented_player": {
+       "planted": 21,
+       "caught": 21
+      },
+      "wrong_score_pair": {
+       "planted": 15,
+       "caught": 15
+      },
+      "swapped_team": {
+       "planted": 13,
+       "caught": 0
+      }
+     },
+     "planted_total": 105,
+     "caught_total": 92,
+     "caught_excl_team_swap": [
+      92,
+      92
+     ]
+    },
+    "groundedness_judge": {
+     "mean": 4.57,
+     "n": 35,
+     "distribution": {
+      "1": 0,
+      "2": 3,
+      "3": 0,
+      "4": 6,
+      "5": 26
+     }
+    }
+   }
+  ]
+ }
+}
