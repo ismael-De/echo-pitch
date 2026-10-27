@@ -27,11 +27,11 @@ from analytics.stats import _bucket as A_bucket
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 DATA_DIR = Path(os.environ.get("ECHO_DATA_DIR", Path(__file__).resolve().parent.parent / "data"))
-from echo_mcp import build_server  # noqa: E402
+from echo_mcp import build_server, http_app  # noqa: E402
 from app import tts  # noqa: E402
 
-MCP = build_server(http=True)
-_MCP_APP = MCP.streamable_http_app()
+MCP = build_server()
+_MCP_APP = http_app(MCP)
 
 
 @asynccontextmanager

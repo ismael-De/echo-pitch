@@ -1,0 +1,14 @@
+● list_matches (MCP: echo-pitch)
+  └ {
+
+● verify_commentary (MCP: echo-pitch) · match_id: "EP-2026-002", text: "Saltmarsh FC beat Brackenri…
+  └ {"ok":false,"evidence":[{"claim":"2.74","fact":"stats.xg.Saltmarsh FC","how":...
+
+Verdict: **Not verified**. The 2.74 xG and both team names match, but the 4–1 score does not match any score or stat pair.
+
+
+
+Changes    +0 -0
+AI Credits 0.21 (8s)
+Tokens     ↑ 41.0k (27.1k cached, 13.9k written) • ↓ 110
+Resume     copilot --resume=255bafb0-9a49-4c27-8c4f-7a1479d59ea7

@@ -14,7 +14,7 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
 
 import analytics as A
@@ -96,14 +96,18 @@ def verify_commentary(match_id: str, text: str, minute: int | None = None, event
 TOOLS = [list_matches, get_match_stats, get_key_moments, get_event, verify_commentary]
 
 
-def build_server(http: bool = False) -> FastMCP:
-    mcp = FastMCP("echo-pitch", instructions="Synthetic football match stats and a deterministic commentary "
-                  "fact-checker. Call list_matches first.", stateless_http=http, json_response=http,
-                  streamable_http_path="/",
-                  transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False))
+def build_server() -> MCPServer:
+    mcp = MCPServer("echo-pitch", instructions="Synthetic football match stats and a deterministic commentary "
+                    "fact-checker. Call list_matches first.")
     for fn in TOOLS:
         mcp.tool()(fn)
     return mcp
+
+
+def http_app(mcp: MCPServer):
+    """Stateless streamable-HTTP app (mounted by the web app at /mcp/)."""
+    return mcp.streamable_http_app(streamable_http_path="/", stateless_http=True, json_response=True,
+                                   transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False))
 
 
 def main() -> None:

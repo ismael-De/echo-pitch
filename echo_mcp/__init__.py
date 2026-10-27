@@ -1,4 +1,4 @@
 """Echo Pitch MCP server: match stats and the Verifier as Model Context Protocol tools."""
-from .server import build_server
+from .server import build_server, http_app
 
-__all__ = ["build_server"]
+__all__ = ["build_server", "http_app"]
