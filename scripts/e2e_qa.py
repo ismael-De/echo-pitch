@@ -24,6 +24,7 @@ def http(base, path, method="GET", body=None, headers=None):
 
 def api_probes(base):
     s, b, h = http(base, "/")
+    h = {k.lower(): v for k, v in h.items()}
     check("csp_and_nosniff", "frame-ancestors" in h.get("content-security-policy", "") and h.get("x-content-type-options") == "nosniff")
     check("cache_busted_assets", "/static/app.js?v=" in b and "/static/style.css?v=" in b and "no-cache" in h.get("cache-control", ""))
     s, b, _ = http(base, "/api/replays", "POST", b'{"match_id":"../../etc/passwd"}'); check("path_traversal_404", s == 404 and "Traceback" not in b, status=s)
@@ -34,10 +35,12 @@ def api_probes(base):
     check("tts_ssml_injection_safe", s in (200, 503) , status=s)
     s, b, _ = http(base, "/api/config"); check("config_no_secrets", s == 200 and not any(k in b.lower() for k in ("key\"", "secret", "password", "token", "endpoint\"")), body=b[:200])
     s, b, _ = http(base, "/api/replays/nope/audit"); check("unknown_replay_404", s == 404 and "Traceback" not in b, status=s)
-    s, b, h = http(base, "/api/health", headers={"Origin": "https://evil.example"})
+    s, b, h = http(base, "/api/health", headers={"Origin": "https://evil.example"}); h = {k.lower(): v for k, v in h.items()}
     check("no_wildcard_cors", h.get("access-control-allow-origin") not in ("*", "https://evil.example"), acao=h.get("access-control-allow-origin"))
-    codes = [http(base, "/api/tts", "POST", json.dumps({"text": f"rate probe {i % 3}", "lang": "en"}).encode(),
-                  {"X-Forwarded-For": f"203.0.113.{i}"})[0] for i in range(100)]
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(12) as ex:
+        codes = list(ex.map(lambda i: http(base, "/api/tts", "POST", json.dumps({"text": f"rate probe {i % 3}", "lang": "en"}).encode(),
+                                           {"X-Forwarded-For": f"203.0.113.{i}"})[0], range(70)))
     check("tts_rate_limited_even_with_spoofed_xff", 429 in codes, first429=codes.index(429) if 429 in codes else None)
 
 
@@ -48,8 +51,12 @@ def ui(base):
         pg = ctx.new_page()
         pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.on("console", lambda m: m.type == "error" and errs.append(m.text))
-        pg.on("request", lambda r: r.url.endswith("/api/tts") and tts.append((time.time(), json.loads(r.post_data or "{}").get("lang"))))
-        pg.on("response", lambda r: r.url.endswith("/api/tts") and r.ok and tts.append((time.time(), "voice:" + (r.headers.get("x-voice") or ""))))
+        sent = {}
+        def onreq(r):
+            if r.url.endswith("/api/tts"): sent[id(r)] = time.time(); tts.append((sent[id(r)], json.loads(r.post_data or "{}").get("lang")))
+        def onresp(r):
+            if r.url.endswith("/api/tts") and r.ok: tts.append((sent.get(id(r.request), 0), "voice:" + (r.headers.get("x-voice") or "")))
+        pg.on("request", onreq); pg.on("response", onresp)
         pg.goto(base + "/", wait_until="networkidle")
         check("title_favicon_howto", "Echo Pitch" in pg.title() and pg.locator("link[rel=icon]").count() == 1 and pg.locator("#howto:visible").count() == 1)
         # audit before kickoff: friendly message, not JSON

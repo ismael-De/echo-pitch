@@ -64,7 +64,20 @@ class RateLimit:
             self.hits.clear()
 
 
-TTS_RL, REPLAY_RL, VERIFY_RL = RateLimit(90, 60), RateLimit(20, 60), RateLimit(60, 60)
+TTS_RL, REPLAY_RL, VERIFY_RL = RateLimit(45, 60), RateLimit(20, 60), RateLimit(60, 60)
+
+
+_TTS_CHARS: list[tuple[float, int]] = []
+TTS_CHARS_PER_HOUR = int(os.environ.get("TTS_CHARS_PER_HOUR", "250000"))
+
+
+def _tts_global(n: int):
+    """Global hourly character budget across all visitors, so the Speech bill has a hard ceiling."""
+    now = time.monotonic()
+    _TTS_CHARS[:] = [x for x in _TTS_CHARS if now - x[0] < 3600]
+    if sum(c for _, c in _TTS_CHARS) + n > TTS_CHARS_PER_HOUR:
+        raise HTTPException(429, "speech budget reached; using the browser voice")
+    _TTS_CHARS.append((now, n))
 
 
 @lru_cache(maxsize=32)
@@ -254,6 +267,7 @@ class TTSRequest(BaseModel):
 async def speak(req: TTSRequest, request: Request):
     """Azure AI Speech neural voice (mp3). 503 when Speech is not configured: the UI then uses the browser voice."""
     TTS_RL.check(request)
+    _tts_global(len(req.text))
     if not tts.configured():
         raise HTTPException(503, "Azure Speech not configured")
     try:
