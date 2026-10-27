@@ -30,7 +30,7 @@ intelligence, made for every fan.
 - An SSE replay API and a broadcast-style web UI: pitch map, overlays, momentum, Analyst/Fan, EN/AR/ES/FR/PT (RTL for Arabic).
 - A Verifier (Guard) agent with evidence footnotes in the UI, and a measured eval (`docs/EVAL.md`): planted errors, false rejections, LLM-as-judge groundedness 4.77/5, latency.
 - An MCP server (`/mcp/` + stdio) exposing the stats and the Verifier. A Foundry Agent Framework agent and GitHub Copilot CLI both used it.
-- Spoken commentary (Azure AI Speech: en-GB, ar-JO, es-ES, fr-FR, pt-BR neural voices) and an audio-first accessible mode.
+- Spoken commentary (Azure AI Speech: en-GB, ar-SA (ar-JO optional), es-ES, fr-FR, pt-BR neural voices) and an audio-first accessible mode.
 - An optional producer-approval mode and a per-replay audit log of every verdict and decision.
 - A Docker image, an Azure Container Apps deploy script and GitHub Actions CI.
 
