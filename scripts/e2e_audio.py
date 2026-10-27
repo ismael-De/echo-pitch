@@ -33,11 +33,12 @@ def run(base, lang, secs):
         pg.wait_for_timeout(secs * 1000)
         ev = pg.evaluate("window.__ev")
         b.close()
+    # playing[0] is the silent unlock played inside the click
     playing = [round((t - start) / 1000, 2) for k, t in ev if k == "playing"]
     blocked = [k for k, _ in ev if k == "error:NotAllowedError"]
     return {"lang": lang, "tts_calls": len(tts), "tts_ok": sum(s == 200 for _, s, _ in tts),
             "voices": sorted({v for *_, v in tts if v}), "playing_events": len(playing),
-            "first_speech_s": playing[1] if len(playing) > 1 else None,  # playing[0] is the silent unlock "blocked": len(blocked), "page_errors": errs[:5]}
+            "first_speech_s": playing[1] if len(playing) > 1 else None, "blocked": len(blocked), "page_errors": errs[:5]}
 
 
 if __name__ == "__main__":
