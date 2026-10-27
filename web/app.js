@@ -36,6 +36,13 @@ const I18N = {
        potm:"Craque do jogo", controlled:"controlado", contested:"disputado", chaotic:"caótico",
        "fast and direct":"rápido e direto", "slow build-up":"construção lenta", steady:"estável", goal:"GOL!",
        xg:"xG", difficulty:"Dificuldade do passe", speedAlert:"km/h", attacks:"ataca"},
+  ru: {prodOn:"Режим продюсера включён: переписанные ИИ реплики ждут здесь «Одобрить / Отклонить». Проверенные шаблонные реплики идут в эфир сразу.", prodIdle:"Нажмите «Начать». Черновики ИИ появятся здесь для одобрения.", prodOff:"ИИ для этого зрителя отключён (лимит: 6 трансляций с ИИ в час), поэтому идут только проверенные реплики и одобрять нечего.", prodNoAI:"Этот сервер работает без ИИ-редактора, поэтому все реплики — проверенные шаблоны и одобрять нечего.", prodWait:"Ждём следующую реплику ИИ о ключевом моменте…", startErr:"Не удалось связаться с сервером; нажмите «Начать» ещё раз.", howto:"Как попробовать: нажмите ▶ Начать, включите 🔊 Звук, меняйте 🌐 язык в любой момент, откройте 🎬 Продюсер, чтобы одобрять реплики ИИ, и 📜 Журнал, чтобы увидеть каждую проверку.", tAudio:"Голосовой комментарий (нейронные голоса Azure)", tA11y:"Аудиорежим для незрячих и слабовидящих болельщиков (клавиша A)", tProd:"Одобрение продюсера: реплики ИИ ждут подтверждения человека", tAudit:"Журнал: каждая проверка верификатора и каждое решение", recapVer:"Верификатор: проверено {c} · отклонено {r} · оставлен шаблон {f}", audioOn:"Звук включён", a11yOn:"Аудиорежим включён: все реплики читаются вслух. Клавиши: Пробел — начать, S — счёт, A — выключить.", auditTitle:"Журнал проверок", aTime:"Время", aLine:"Реплика", aResult:"Верификатор", aApprover:"Кто одобрил", aAction:"Действие", aPass:"Пройдена", aReject:"Заблокирована", aApproved:"Одобрено", aRejected:"Отклонено", aPublished:"Опубликована", aWithheld:"Задержана", aAuto:"Автоматически", aProducer:"Продюсер", aEmpty:"Записей пока нет. Нажмите «Начать» и откройте журнал снова.", aNoMatch:"Начните матч, чтобы увидеть журнал.", aSum:"Проверено реплик: {c} · заблокировано: {r} · одобрено: {a} · отклонено: {j}", aLoadErr:"Не удалось загрузить журнал.", audio:"Звук", a11y:"Аудиорежим", approval:"Продюсер", audit:"Журнал", verified:"проверено", approve:"Одобрить", reject:"Отклонить", pending:"Черновик ИИ ждёт", evidence:"Источник", tagline:"ИИ-комментатор матчей", match:"Матч", speed:"Скорость", fan:"Болельщик", analyst:"Аналитик",
+       club:"Клуб", player:"Игрок", none:"Нет", start:"▶ Начать", restart:"↻ Заново", possession:"Владение",
+       shots:"Удары", ontarget:"В створ", passes:"% передач", momentum:"Инициатива", commentary:"Прямой комментарий",
+       moments:"Ключевые моменты · почему они важны", agents:"Агенты", fulltime:"Итоги матча", close:"Закрыть",
+       potm:"Игрок матча", controlled:"под контролем", contested:"равная борьба", chaotic:"хаотичная",
+       "fast and direct":"быстро и прямолинейно", "slow build-up":"медленное построение", steady:"ровная", goal:"ГОЛ!",
+       xg:"xG", difficulty:"Сложность паса", speedAlert:"км/ч", attacks:"атакует"},
 };
 const qs = new URLSearchParams(location.search);
 const S = {persona: qs.get("persona") || "fan", lang: qs.get("lang") || "en", club: qs.get("club") || "",
@@ -191,7 +198,7 @@ function holdBox(ref, label, text, onApprove) {
 function vchip() { $("verChip").textContent = `🛡 ${S.vstats.checked}${S.vstats.rejected ? ` · ✕ ${S.vstats.rejected}` : ""}`; }
 
 // ---------------------------------------------------------------- speech (Azure AI Speech, browser fallback)
-const VOICE_LANG = {en: "en-GB", ar: "ar-SA", es: "es-ES", fr: "fr-FR", pt: "pt-BR"};
+const VOICE_LANG = {en: "en-GB", ar: "ar-SA", es: "es-ES", fr: "fr-FR", pt: "pt-BR", ru: "ru-RU"};
 const SQ = {queue: [], busy: false, audio: new Audio(), spoken: new Set(), engine: null};
 function say(text, id, isUpdate) {
   if (id && SQ.spoken.has(id) && !isUpdate) return;

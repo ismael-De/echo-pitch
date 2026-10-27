@@ -259,7 +259,7 @@ def verify(req: VerifyRequest, request: Request):
 
 class TTSRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=tts.MAX_CHARS)
-    lang: str = Field("en", pattern="^(en|ar|es|fr|pt)$")
+    lang: str = Field("en", pattern="^(en|ar|es|fr|pt|ru)$")
     voice: str | None = Field(None, max_length=40, description="optional alternative voice, e.g. ar-JO-TaimNeural")
 
 
@@ -280,7 +280,7 @@ async def speak(req: TTSRequest, request: Request):
 @app.get("/api/replays/{rid}/stream")
 async def replay_stream(request: Request, rid: str, stats_every: int = Query(25, ge=1, le=500),
                         persona: str = Query("fan", pattern="^(fan|analyst)$"),
-                        lang: str = Query("en", pattern="^(en|ar|es|fr|pt)$"),
+                        lang: str = Query("en", pattern="^(en|ar|es|fr|pt|ru)$"),
                         club: str | None = Query(None, pattern="^(home|away)$"),
                         player: str | None = None, from_now: bool = False, agents: bool = True,
                         approval: bool = False):

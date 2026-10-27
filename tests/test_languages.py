@@ -6,7 +6,7 @@ from agents.orchestrator import Prefs
 from agents.specialists import WrongLanguage, check_language
 from tests.test_agents import match, of, run  # noqa: F401  (fixture re-export)
 
-NEW = ("es", "fr", "pt")
+NEW = ("es", "fr", "pt", "ru")
 
 
 def _keys(d, prefix=""):
@@ -38,6 +38,9 @@ def test_offline_match_in_language(match, lang):
     ("El portero se estira y la saca con la mano.", "en"),
     ("Le gardien est battu et c'est le but pour Saltmarsh FC.", "pt"),
     ("هدف رائع من Luca Jessop", "fr"),
+    ("Вратарь отбивает удар Luca Jessop!", "en"),
+    ("Le gardien est battu et c'est le but pour Saltmarsh FC.", "ru"),
+    ("هدف رائع من Luca Jessop", "ru"),
 ])
 def test_language_guard_rejects_wrong_language(text, lang):
     with pytest.raises(WrongLanguage):
@@ -48,6 +51,7 @@ def test_language_guard_rejects_wrong_language(text, lang):
     ("¡Qué parada de Luca Jessop! El portero salva a su equipo.", "es"),
     ("Quel arrêt de Luca Jessop ! Le gardien sauve les siens.", "fr"),
     ("Que defesa de Luca Jessop! O goleiro salva o time.", "pt"),
+    ("Какой сейв, Luca Jessop! Вратарь спасает Saltmarsh FC.", "ru"),
 ])
 def test_language_guard_accepts_right_language(text, lang):
     check_language(text, lang)
@@ -60,3 +64,12 @@ def test_percentages_are_whole_numbers(match, lang):
     _, items = run(meta, ev, Prefs("analyst", lang))
     texts = [c["text"] for c in of(items, "commentary")] + [of(items, "recap")[0]["text"]]
     assert not any(re.search(r"\d+\.\d+ ?%", t) for t in texts)
+
+
+@pytest.mark.parametrize("text", [
+    "The keeper is beaten and it's a goal for Saltmarsh FC.",
+    "Гол and the crowd goes wild for Saltmarsh FC",
+])
+def test_russian_guard_rejects_non_russian(text):
+    with pytest.raises(WrongLanguage):
+        check_language(text, "ru")

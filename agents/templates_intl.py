@@ -92,16 +92,48 @@ LINES = {
         "halftime": {"fan": ["Intervalo: {score}."], "analyst": ["Intervalo: {score}. xG {xg_h}-{xg_a}, posse {pos_h}%-{pos_a}%."]},
         "fulltime": {"fan": ["Fim de jogo! {score}."], "analyst": ["Fim de jogo: {score}. xG {xg_h}-{xg_a}."]},
     },
+    "ru": {
+        "goal": {"fan": ["ГОООЛ! {player} забивает за {team}! {score}", "Гол! {player} взрывает трибуны {team}! {score}",
+                         "{player} отправляет мяч в сетку! Какой момент для {team}! {score}"],
+                 "analyst": ["Гол: {player} ({team}) реализует момент на {xg} xG с {dist} м. {score}",
+                             "{player} забивает с {dist} м (xG {xg}), удар {speed} км/ч. {score}"]},
+        "shot_saved": {"fan": ["{player} бьёт, но вратарь на месте!", "Неплохая попытка, {player}, но вратарь забирает."],
+                       "analyst": ["{player} заставляет вратаря сыграть с {dist} м (xG {xg}).", "В створ, {player}: {xg} xG, {speed} км/ч, отражено."]},
+        "shot_off_target": {"fan": ["{player} пробивает... мимо ворот.", "Выше перекладины, {player}!"],
+                            "analyst": ["{player} не попадает в створ с {dist} м (xG {xg}).", "Мимо: {player}, {xg} xG под давлением {press}."]},
+        "shot_blocked": {"fan": ["{player} бьёт, но защита блокирует!", "Защитники бросаются под удар, {player} не пробил!"],
+                         "analyst": ["Удар {player} ({xg} xG) заблокирован.", "Заблокированный удар: {player} ({dist} м)."]},
+        "save_wonder": {"fan": ["КАКОЙ СЕЙВ, {player}! Невероятно!", "{player} в полёте вытаскивает мяч! Фантастика!"],
+                        "analyst": ["Сейв мирового уровня: {player} отражает удар на {xg} xG.", "{player} на реакции снимает {xg} xG."]},
+        "save": {"fan": ["Надёжные руки, {player}.", "{player} спокойно забирает мяч."],
+                 "analyst": ["Сейв: {player} ({xg} xG).", "Простой сейв, {player}, {xg} xG."]},
+        "tackle": {"fan": ["Какой отбор, {player}!", "{player} возвращает мяч для {team}!"],
+                   "analyst": ["{player}: отбор, зона — {zone}.", "Мяч отобран, {player} ({zone})."]},
+        "foul": {"fan": ["Фол, {player}. Штрафной.", "{player} опаздывает, судья свистит."],
+                 "analyst": ["Фол, {player}, зона — {zone}; фолов у {team}: {fouls}.", "{player} прерывает атаку фолом ({zone})."]},
+        "hard_pass": {"fan": ["Какой пас, {player}!", "{player} отдаёт шикарный пас!"],
+                      "analyst": ["Пас сложности {diff}/100 удался, {player}: {length} м в последнюю треть.",
+                                  "{player} разрезает линии: пас на {length} м, сложность {diff}."]},
+        "speed": {"fan": ["{player} улетает вперёд!", "Посмотрите на скорость, {player}!"],
+                  "analyst": ["{player} протаскивает мяч {length} м со скоростью {speed} км/ч.", "Скорость: {player}, {speed} км/ч."]},
+        "insight": {"fan": ["Сейчас лучше {dom}, владение {pos}%."],
+                    "analyst": ["Цифры, {clock}: владение {pos_h}%-{pos_a}%, xG {xg_h}-{xg_a}, удары {sh_h}-{sh_a}. Игра: {phase}."]},
+        "kickoff": {"fan": ["Мяч в игре: {home} против {away}!"], "analyst": ["Стартовый свисток: {home} — {away}, у обеих схема 4-3-3."]},
+        "halftime": {"fan": ["Перерыв: {score}."], "analyst": ["Перерыв: {score}. xG {xg_h}-{xg_a}, владение {pos_h}%-{pos_a}%."]},
+        "fulltime": {"fan": ["Финальный свисток! {score}."], "analyst": ["Итоговый счёт: {score}. xG {xg_h}-{xg_a}."]},
+    },
 }
 
 ZONES = {"es": ("el tercio defensivo", "el centro del campo", "el último tercio"),
          "fr": ("le tiers défensif", "le milieu de terrain", "le dernier tiers"),
-         "pt": ("terço defensivo", "meio-campo", "terço final")}
+         "pt": ("terço defensivo", "meio-campo", "terço final"),
+         "ru": ("своя треть поля", "центр поля", "последняя треть")}
 
 FAVOURITE = {
     "es": {"for": ["¡Vamos, {club}!", "¡Sí, {club}!"], "against": ["Ojo, {club}...", "¡Peligro para {club}!"], "star": "★ {player}"},
     "fr": {"for": ["Allez {club} !", "Oui, {club} !"], "against": ["Attention, {club}...", "Danger pour {club} !"], "star": "★ {player}"},
     "pt": {"for": ["Vamos, {club}!", "Isso, {club}!"], "against": ["Cuidado, {club}...", "Perigo para o {club}!"], "star": "★ {player}"},
+    "ru": {"for": ["Вперёд, {club}!", "Да, {club}!"], "against": ["Осторожно, {club}...", "Опасность для {club}!"], "star": "★ {player}"},
 }
 
 MOMENTS = {
@@ -159,6 +191,24 @@ MOMENTS = {
         "titles": {"goal": "GOL", "big_chance_missed": "CHANCE CLARA", "key_save": "DEFESA DECISIVA", "pressure_spike": "BLITZ NA MARCAÇÃO"},
         "phase": {"controlled": "controlado", "contested": "disputado", "chaotic": "caótico"},
     },
+    "ru": {
+        "goal_lead": "{team} выходит вперёд. Матч меняется: теперь {opp} придётся раскрыться.",
+        "goal_equaliser": "Счёт сравнялся! {team} отыгрывается, и всё начинается заново.",
+        "goal_extend": "{team} увеличивает отрыв: два мяча преимущества, отыграться будет очень трудно.",
+        "goal_extend_more": "{team} доводит преимущество до {margin}; похоже, всё решено.",
+        "goal_pullback": "{team} сокращает отставание; борьба продолжается, разница — {margin}.",
+        "late": " Это {minute}-я минута, времени на ответ почти нет.",
+        "against_run": " Гол вопреки ходу игры: инициатива была у {opp}.",
+        "with_run": " Награда за долгий отрезок давления {team}.",
+        "low_xg": " Маловероятный удар ({xg} xG): из 100 таких моментов забивают лишь около {pct}.",
+        "high_xg": " Качественный момент ({xg} xG), который {team} заработала.",
+        "big_chance": "{player} должен был забивать: момент на {xg} xG реализуется примерно {pct} раз из 100. {opp} спасается.",
+        "key_save": "{player} отразил момент на {xg} xG — почти {pct}% гола для {opp}.",
+        "wonder": " Сейв на реакции мирового уровня, который сохраняет счёт.",
+        "pressure_spike": "{team} усилила прессинг ({value} при среднем {avg}). На этом отрезке {turnovers} потерь, игра — {phase}.",
+        "titles": {"goal": "ГОЛ", "big_chance_missed": "ВЕРНЫЙ МОМЕНТ", "key_save": "КЛЮЧЕВОЙ СЕЙВ", "pressure_spike": "ВОЛНА ПРЕССИНГА"},
+        "phase": {"controlled": "под контролем", "contested": "равная борьба", "chaotic": "хаотичная"},
+    },
 }
 
 RECAP = {
@@ -183,6 +233,13 @@ RECAP = {
            "control": " {dom} teve a bola ({pos}% de posse) e acertou {comp}% dos passes.",
            "save": " A defesa do jogo: {keeper} parando uma chance de {xg} xG aos {minute} minutos.",
            "potm": " Craque do jogo: {player} ({team})."},
+    "ru": {"result_win": "{winner} обыграл {loser} со счётом {score}, стадион: {venue}.", "result_draw": "{home} и {away} сыграли вничью {score}, стадион: {venue}.",
+           "xg_fair": " По ожидаемым голам ({xg_h}-{xg_a}) результат справедлив.",
+           "xg_unfair": " xG ({xg_h}-{xg_a}) говорит, что {better} заслуживал большего.", "goals": " Голы: {goals}.",
+           "no_goals": " Ни одна из команд так и не смогла забить.",
+           "control": " {dom} владел мячом ({pos}% владения) и точно отдал {comp}% передач.",
+           "save": " Сейв матча: {keeper} отражает момент на {xg} xG на {minute}-й минуте.",
+           "potm": " Игрок матча: {player} ({team})."},
 }
 
 TYPE_NAMES = {
@@ -192,5 +249,7 @@ TYPE_NAMES = {
            "possession_change": "perte de balle", "foul": "faute", "goal": "but", "save": "arrêt"},
     "pt": {"pass": "passe", "shot": "chute", "tackle": "desarme", "carry": "condução", "pressure": "pressão",
            "possession_change": "perda de posse", "foul": "falta", "goal": "gol", "save": "defesa"},
+    "ru": {"pass": "пас", "shot": "удар", "tackle": "отбор", "carry": "проход с мячом", "pressure": "прессинг",
+           "possession_change": "потеря мяча", "foul": "фол", "goal": "гол", "save": "сейв"},
 }
-SAFE = {k: "{clock} {player} ({team}): {kind}." for k in ("es", "fr", "pt")}
+SAFE = {k: "{clock} {player} ({team}): {kind}." for k in ("es", "fr", "pt", "ru")}

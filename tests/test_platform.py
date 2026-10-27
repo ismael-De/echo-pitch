@@ -127,7 +127,7 @@ def test_tts_azure_called(client, monkeypatch):
 def test_ssml_escapes_and_voices():
     s = tts.ssml("A <b> & 'c'", "fr")
     assert "fr-FR-HenriNeural" in s and "&lt;b&gt; &amp;" in s
-    assert set(tts.VOICES) == {"en", "ar", "es", "fr", "pt"}
+    assert set(tts.VOICES) == {"en", "ar", "es", "fr", "pt", "ru"}
 
 
 def test_tts_alt_voice_allowlist():
@@ -144,3 +144,11 @@ def test_index_versioned_assets_and_no_cache(client):
     assert "/static/app.js?v=" in r.text and "/static/style.css?v=" in r.text
     js = client.get("/static/app.js")
     assert js.status_code == 200 and "no-cache" in js.headers["cache-control"]
+
+
+def test_russian_voice():
+    assert tts.pick("ru", None) == ("ru-RU", "ru-RU-DmitryNeural")
+    assert tts.pick("ru", "ar-JO-TaimNeural") == ("ru-RU", "ru-RU-DmitryNeural")  # Arabic alt voice never leaks into ru
+    s = tts.ssml("Гол! Luca Jessop забивает.", "ru")
+    assert "xml:lang='ru-RU'" in s and "ru-RU-DmitryNeural" in s and "Гол!" in s
+    assert tts.pick("ar", None) == ("ar-SA", "ar-SA-HamedNeural")

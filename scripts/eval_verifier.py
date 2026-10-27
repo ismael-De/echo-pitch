@@ -143,7 +143,7 @@ async def offline():
     per_lang = {}
     for mp in sorted(glob.glob(str(ROOT / "data" / "*_meta.json"))):
         meta, ev = load(mp)
-        for lang in ("en", "ar", "es", "fr", "pt"):
+        for lang in ("en", "ar", "es", "fr", "pt", "ru"):
             for persona in ("fan", "analyst"):
                 start = len(CAPTURE)
                 await replay(meta, ev, Prefs(persona, lang, "home", meta["home"]["lineup"][9]["player_id"]), s)

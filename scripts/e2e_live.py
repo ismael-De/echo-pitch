@@ -12,7 +12,7 @@ import time
 
 import httpx
 
-LANGS = ["en", "ar", "es", "fr", "pt"]
+LANGS = ["en", "ar", "es", "fr", "pt", "ru"]
 
 
 def sse(text):

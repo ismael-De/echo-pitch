@@ -184,4 +184,4 @@ from . import templates_intl as _intl  # noqa: E402
 for _name in ("LINES", "ZONES", "FAVOURITE", "MOMENTS", "RECAP", "TYPE_NAMES", "SAFE"):
     globals()[_name].update(getattr(_intl, _name))
 
-LANGS = ("en", "ar", "es", "fr", "pt")
+LANGS = ("en", "ar", "es", "fr", "pt", "ru")

@@ -13,7 +13,7 @@ import httpx
 
 VOICES = {"en": ("en-GB", "en-GB-RyanNeural"), "ar": ("ar-SA", "ar-SA-HamedNeural"),
           "es": ("es-ES", "es-ES-AlvaroNeural"), "fr": ("fr-FR", "fr-FR-HenriNeural"),
-          "pt": ("pt-BR", "pt-BR-AntonioNeural")}
+          "pt": ("pt-BR", "pt-BR-AntonioNeural"), "ru": ("ru-RU", "ru-RU-DmitryNeural")}
 # Optional alternatives a listener can pick (?voice=...). The default Arabic voice is the neutral broadcast ar-SA voice.
 ALT_VOICES = {"ar-JO-TaimNeural": "ar-JO", "ar-JO-SanaNeural": "ar-JO", "ar-AE-HamdanNeural": "ar-AE",
               "ar-QA-MoazNeural": "ar-QA", "ar-SA-HamedNeural": "ar-SA"}

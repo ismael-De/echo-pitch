@@ -5,7 +5,7 @@ python scripts/e2e_qa.py [--base URL]
 import argparse, json, sys, time, urllib.request, urllib.error
 from playwright.sync_api import sync_playwright
 
-VOICE = {"en": "en-GB-RyanNeural", "ar": "ar-SA-HamedNeural", "es": "es-ES-AlvaroNeural", "fr": "fr-FR-HenriNeural", "pt": "pt-BR-AntonioNeural"}
+VOICE = {"en": "en-GB-RyanNeural", "ar": "ar-SA-HamedNeural", "es": "es-ES-AlvaroNeural", "fr": "fr-FR-HenriNeural", "pt": "pt-BR-AntonioNeural", "ru": "ru-RU-DmitryNeural"}
 EN_WORDS = ["Kick off", "Audio-first", "Producer", "Audit log", "Time", "Line", "Evidence", "Approver", "How to try", "Close", "verified"]
 R = {"ok": True, "checks": []}
 
@@ -65,7 +65,7 @@ def ui(base):
         pg.click("#auditClose")
         pg.click("#audioBtn"); pg.click("#startBtn"); pg.wait_for_timeout(1200); pg.click("#startBtn")  # kick off twice
         pg.wait_for_timeout(12000)
-        for lang in ["ar", "es", "fr", "pt", "en", "ar"]:  # switch mid-match with audio on
+        for lang in ["ar", "es", "fr", "pt", "ru", "en", "ar"]:  # switch mid-match with audio on
             t0 = time.time(); pg.select_option("#langSel", lang); pg.wait_for_timeout(9000)
             after = [x for x in tts if x[0] > t0 + 0.05]
             langs = {x[1] for x in after if not str(x[1]).startswith("voice:")}; voices = {x[1][6:] for x in after if str(x[1]).startswith("voice:")}

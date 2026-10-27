@@ -35,6 +35,9 @@ STYLE = {
            "(but, frappe, arrêt, contre-attaque), no English words. Keep player and club names exactly as given."),
     "pt": (" Write the answer in Brazilian Portuguese, like a Brazilian TV football narrator: natural, idiomatic "
            "(gol, chute, defesa, contra-ataque), no English words. Keep player and club names exactly as given."),
+    "ru": (" Write the answer in Russian, like a Russian TV football commentator: natural, idiomatic football Russian "
+           "(гол, удар, сейв, контратака), Cyrillic script, no English words. Keep player and club names exactly as given "
+           "in Latin script and do not decline or transliterate them; use Western digits for numbers and scores."),
 }
 
 
@@ -267,6 +270,16 @@ def check_language(text: str, lang: str) -> None:
     import re as _re
     arabic = len(_re.findall(r"[\u0600-\u06FF]", text))
     letters = len(_re.findall(r"[A-Za-z\u00C0-\u00FF\u0600-\u06FF]", text)) or 1
+    cyr = len(_re.findall(r"[\u0400-\u04FF]", text))
+    if lang == "ru":
+        # Club/player names stay in Latin script, so judge by Cyrillic words, not by the letter share.
+        latin_words = _re.findall(r"[a-zà-ÿ']+", text.lower())
+        if arabic or len(_re.findall(r"[\u0400-\u04FF]{2,}", text)) < 1 or \
+                max(sum(w in v for w in latin_words) for v in _STOP.values()) >= 2:
+            raise WrongLanguage("expected Russian output")
+        return
+    if cyr > 0:
+        raise WrongLanguage(f"expected {lang} output, got Cyrillic script")
     if lang == "ar":
         if arabic / letters < 0.4:
             raise WrongLanguage("expected Arabic output")
