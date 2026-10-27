@@ -103,3 +103,7 @@ body.a11y{font-size:20px}body.a11y #ticker li{font-size:22px;line-height:1.5;bac
 body.a11y .feed{max-height:none}body.a11y #ticker li .c{color:#ffeb3b}body.a11y .pitch-wrap,body.a11y .momentum{display:none}
 body.a11y .card p{font-size:20px;color:#fff}body.a11y .grid{grid-template-columns:1fr 1fr}
 *:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+
+.producer{border:1px solid var(--acc)}.producer p{margin:4px 0 8px;font-size:13px;color:var(--mut)}
+.a11y-banner{background:#ffeb3b;color:#000;font-weight:800;font-size:20px;padding:12px 14px;border-radius:10px;margin-bottom:10px}
+.hidden{display:none!important}

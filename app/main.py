@@ -15,7 +15,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query, Request
 from contextlib import asynccontextmanager
 
-from fastapi.responses import FileResponse, Response, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -220,6 +220,7 @@ def verify(req: VerifyRequest):
 class TTSRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=tts.MAX_CHARS)
     lang: str = Field("en", pattern="^(en|ar|es|fr|pt)$")
+    voice: str | None = Field(None, max_length=40, description="optional alternative voice, e.g. ar-JO-TaimNeural")
 
 
 @app.post("/api/tts")
@@ -228,10 +229,10 @@ async def speak(req: TTSRequest):
     if not tts.configured():
         raise HTTPException(503, "Azure Speech not configured")
     try:
-        audio = await tts.synthesize(req.text, req.lang)
+        audio = await tts.synthesize(req.text, req.lang, req.voice)
     except Exception as ex:  # noqa: BLE001 - quota / network: tell the UI to fall back
         raise HTTPException(502, f"speech failed: {type(ex).__name__}")
-    return Response(audio, media_type="audio/mpeg", headers={"X-Voice": tts.VOICES[req.lang][1]})
+    return Response(audio, media_type="audio/mpeg", headers={"X-Voice": tts.pick(req.lang, req.voice)[1], "Cache-Control": "no-store"})
 
 
 @app.get("/api/replays/{rid}/stream")
@@ -317,9 +318,25 @@ async def replay_stream(request: Request, rid: str, stats_every: int = Query(25,
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
+NO_CACHE = {"Cache-Control": "no-cache, must-revalidate"}
+BUILD = os.environ.get("APP_BUILD") or str(int(max((p.stat().st_mtime for p in WEB_DIR.glob("*.*")), default=0)))
+
+
 @app.get("/")
 def index():
-    return FileResponse(WEB_DIR / "index.html")
+    """index.html with versioned asset URLs, so a browser never pairs a new page with an old cached app.js."""
+    html = (WEB_DIR / "index.html").read_text(encoding="utf-8")
+    for f in ("app.js", "style.css"):
+        html = html.replace(f'/static/{f}"', f'/static/{f}?v={BUILD}"')
+    return HTMLResponse(html, headers=NO_CACHE)
+
+
+@app.middleware("http")
+async def no_cache_static(request, call_next):
+    resp = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
 
 
 app.mount("/mcp", _MCP_APP)

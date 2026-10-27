@@ -116,15 +116,31 @@ def test_tts_azure_called(client, monkeypatch):
     monkeypatch.setenv("AZURE_SPEECH_KEY", "k")
     monkeypatch.setenv("AZURE_SPEECH_REGION", "uaenorth")
 
-    async def fake(text, lang):
+    async def fake(text, lang, voice=None):
         assert lang == "ar"
         return b"ID3fake"
     monkeypatch.setattr(tts, "synthesize", fake)
     r = client.post("/api/tts", json={"text": "هدف", "lang": "ar"})
-    assert r.status_code == 200 and r.content == b"ID3fake" and r.headers["x-voice"] == "ar-JO-TaimNeural"
+    assert r.status_code == 200 and r.content == b"ID3fake" and r.headers["x-voice"] == "ar-SA-HamedNeural"
 
 
 def test_ssml_escapes_and_voices():
     s = tts.ssml("A <b> & 'c'", "fr")
     assert "fr-FR-HenriNeural" in s and "&lt;b&gt; &amp;" in s
     assert set(tts.VOICES) == {"en", "ar", "es", "fr", "pt"}
+
+
+def test_tts_alt_voice_allowlist():
+    assert tts.pick("ar", "ar-JO-TaimNeural") == ("ar-JO", "ar-JO-TaimNeural")
+    assert tts.pick("ar", None) == ("ar-SA", "ar-SA-HamedNeural")
+    assert tts.pick("en", "ar-JO-TaimNeural") == ("en-GB", "en-GB-RyanNeural")  # voice must match the language
+    assert tts.pick("ar", "evil<voice>")[1] == "ar-SA-HamedNeural"
+    assert "ar-JO-TaimNeural" in tts.ssml("هدف", "ar", "ar-JO-TaimNeural")
+
+
+def test_index_versioned_assets_and_no_cache(client):
+    r = client.get("/")
+    assert r.status_code == 200 and "no-cache" in r.headers["cache-control"]
+    assert "/static/app.js?v=" in r.text and "/static/style.css?v=" in r.text
+    js = client.get("/static/app.js")
+    assert js.status_code == 200 and "no-cache" in js.headers["cache-control"]
