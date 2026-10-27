@@ -25,7 +25,13 @@ az group create -n "$RG" -l "$LOC" -o none
 
 echo "==> Container registry $ACR + cloud build"
 az acr show -n "$ACR" -o none 2>/dev/null || az acr create -g "$RG" -n "$ACR" --sku Basic -o none
-if [ -n "${LOCAL_BUILD:-}" ]; then
+if [ "${LOCAL_BUILD:-}" = "crane" ]; then
+  # No docker/podman and no ACR Tasks: append a layer onto the running image (see infra/crane_build.sh)
+  az acr login -n "$ACR" --expose-token --query accessToken -o tsv |
+    crane auth login "$ACR.azurecr.io" -u 00000000-0000-0000-0000-000000000000 --password-stdin
+  BASE_IMAGE=${BASE_IMAGE:-$(az containerapp show -g "$RG" -n "$APP" --query "properties.template.containers[0].image" -o tsv)} \
+    NEW_IMAGE="$ACR.azurecr.io/echo-pitch:$TAG" infra/crane_build.sh
+elif [ -n "${LOCAL_BUILD:-}" ]; then
   # Some subscriptions (e.g. Azure for Students) block ACR Tasks: build locally with docker/podman and push.
   "$LOCAL_BUILD" build -t "$ACR.azurecr.io/echo-pitch:$TAG" .
   az acr login -n "$ACR" --expose-token --query accessToken -o tsv |
@@ -57,7 +63,13 @@ sleep 30  # let the role assignments propagate before the first image pull
 
 if az containerapp show -g "$RG" -n "$APP" -o none 2>/dev/null; then
   echo "==> Updating $APP to $TAG"
-  az containerapp update -g "$RG" -n "$APP" --image "$ACR.azurecr.io/echo-pitch:$TAG" -o none
+  if [ -n "${AZURE_SPEECH_KEY:-}" ]; then  # spoken commentary (Azure AI Speech), key kept as an app secret
+    az containerapp secret set -g "$RG" -n "$APP" --secrets speech-key="$AZURE_SPEECH_KEY" -o none
+    az containerapp update -g "$RG" -n "$APP" --image "$ACR.azurecr.io/echo-pitch:$TAG" \
+      --set-env-vars AZURE_SPEECH_KEY=secretref:speech-key AZURE_SPEECH_REGION="${AZURE_SPEECH_REGION:-uaenorth}" -o none
+  else
+    az containerapp update -g "$RG" -n "$APP" --image "$ACR.azurecr.io/echo-pitch:$TAG" -o none
+  fi
 else
   echo "==> Container app $APP (LLM_MODE=$MODE)"
   az containerapp create -g "$RG" -n "$APP" --environment "$ENV_NAME" \
