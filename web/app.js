@@ -1,35 +1,35 @@
 // Echo Pitch UI: vanilla JS, consumes the FastAPI SSE replay stream.
 const $ = (id) => document.getElementById(id);
 const I18N = {
-  en: {audioOn:'Audio on', a11yOn:'Audio-first mode on: every line is read aloud. Keys: Space kick off, S score, A off.', prodOn:'Producer mode on: AI-written rewrites wait here for Approve / Reject. Verified template lines still go out live.', prodIdle:'Press Kick off. AI drafts will appear here for approval.', prodOff:'AI is off for this visitor right now (fair-use limit: 6 AI streams per hour), so only verified template lines are shown and there is nothing to approve.', prodNoAI:'This server runs without the AI writer (offline agents), so every line is a verified template and there is nothing to approve.', prodWait:'Waiting for the next AI rewrite of a key moment…', audio:"Audio", a11y:"Audio-first", approval:"Producer", audit:"Audit", verified:"verified", approve:"Approve", reject:"Reject", pending:"AI draft awaiting producer", evidence:"Evidence", tagline:"AI match storyteller", match:"Match", speed:"Speed", fan:"Fan", analyst:"Analyst", club:"Club",
+  en: {auditTitle:"Audit log", aTime:"Time", aLine:"Line", aResult:"Verifier", aApprover:"Approver", aAction:"Action", aPass:"Passed", aReject:"Blocked", aApproved:"Approved", aRejected:"Rejected", aPublished:"Published", aWithheld:"Withheld", aAuto:"Automatic", aProducer:"Producer", aEmpty:"No entries yet. Press Kick off, then open the log again.", aNoMatch:"Start a match first to see its audit log.", aSum:"{c} lines checked · {r} blocked · {a} approved · {j} rejected", aLoadErr:"Could not load the audit log. Try again.", audioOn:'Audio on', a11yOn:'Audio-first mode on: every line is read aloud. Keys: Space kick off, S score, A off.', prodOn:'Producer mode on: AI-written rewrites wait here for Approve / Reject. Verified template lines still go out live.', prodIdle:'Press Kick off. AI drafts will appear here for approval.', prodOff:'AI is off for this visitor right now (fair-use limit: 6 AI streams per hour), so only verified template lines are shown and there is nothing to approve.', prodNoAI:'This server runs without the AI writer (offline agents), so every line is a verified template and there is nothing to approve.', prodWait:'Waiting for the next AI rewrite of a key moment…', audio:"Audio", a11y:"Audio-first", approval:"Producer", audit:"Audit", verified:"verified", approve:"Approve", reject:"Reject", pending:"AI draft awaiting producer", evidence:"Evidence", tagline:"AI match storyteller", match:"Match", speed:"Speed", fan:"Fan", analyst:"Analyst", club:"Club",
        player:"Player", none:"None", start:"▶ Kick off", restart:"↻ Restart", possession:"Possession", shots:"Shots",
        ontarget:"On target", passes:"Pass %", momentum:"Momentum", commentary:"Live commentary",
        moments:"Key moments · why they matter", agents:"Agents", fulltime:"Full-time recap", close:"Close",
        potm:"Player of the match", controlled:"controlled", contested:"contested", chaotic:"chaotic",
        "fast and direct":"fast & direct", "slow build-up":"slow build-up", steady:"steady", goal:"GOAL!",
        xg:"xG", difficulty:"Pass difficulty", speedAlert:"km/h", attacks:"attacks"},
-  ar: {audioOn:'الصوت يعمل', a11yOn:'الوضع الصوتي مفعّل: تُقرأ كل الأسطر بصوت عالٍ. المفاتيح: مسافة للبدء، S للنتيجة، A للإيقاف.', prodOn:'وضع المنتج مفعّل: صياغات الذكاء الاصطناعي تنتظر هنا الموافقة أو الرفض. الأسطر الموثّقة الجاهزة تُعرض مباشرة.', prodIdle:'اضغط بدء المباراة. ستظهر مسودات الذكاء الاصطناعي هنا للموافقة.', prodOff:'الذكاء الاصطناعي متوقف لهذا الزائر حالياً (حد الاستخدام: 6 بثوث في الساعة)، لذلك تُعرض أسطر القوالب الموثّقة فقط ولا يوجد ما يُوافَق عليه.', prodNoAI:'هذا الخادم يعمل دون كاتب الذكاء الاصطناعي، لذلك كل الأسطر قوالب موثّقة ولا يوجد ما يُوافَق عليه.', prodWait:'بانتظار الصياغة التالية من الذكاء الاصطناعي لأهم اللحظات…', audio:"الصوت", a11y:"وضع صوتي", approval:"المنتج", audit:"السجل", verified:"موثّق", approve:"موافقة", reject:"رفض", pending:"مسودة AI بانتظار المنتج", evidence:"الدليل", tagline:"راوي المباريات بالذكاء الاصطناعي", match:"المباراة", speed:"السرعة", fan:"مشجّع", analyst:"محلّل",
+  ar: {auditTitle:"سجل التدقيق", aTime:"الوقت", aLine:"السطر", aResult:"المدقق", aApprover:"المعتمِد", aAction:"الإجراء", aPass:"ناجح", aReject:"محظور", aApproved:"موافَق", aRejected:"مرفوض", aPublished:"نُشر", aWithheld:"حُجب", aAuto:"تلقائي", aProducer:"المنتج", aEmpty:"لا توجد سجلات بعد. اضغط بدء المباراة ثم افتح السجل مجدداً.", aNoMatch:"ابدأ مباراة أولاً لرؤية سجل التدقيق.", aSum:"{c} سطر تم تدقيقه · {r} محظور · {a} موافقة · {j} رفض", aLoadErr:"تعذّر تحميل السجل. حاول مجدداً.", audioOn:'الصوت يعمل', a11yOn:'الوضع الصوتي مفعّل: تُقرأ كل الأسطر بصوت عالٍ. المفاتيح: مسافة للبدء، S للنتيجة، A للإيقاف.', prodOn:'وضع المنتج مفعّل: صياغات الذكاء الاصطناعي تنتظر هنا الموافقة أو الرفض. الأسطر الموثّقة الجاهزة تُعرض مباشرة.', prodIdle:'اضغط بدء المباراة. ستظهر مسودات الذكاء الاصطناعي هنا للموافقة.', prodOff:'الذكاء الاصطناعي متوقف لهذا الزائر حالياً (حد الاستخدام: 6 بثوث في الساعة)، لذلك تُعرض أسطر القوالب الموثّقة فقط ولا يوجد ما يُوافَق عليه.', prodNoAI:'هذا الخادم يعمل دون كاتب الذكاء الاصطناعي، لذلك كل الأسطر قوالب موثّقة ولا يوجد ما يُوافَق عليه.', prodWait:'بانتظار الصياغة التالية من الذكاء الاصطناعي لأهم اللحظات…', audio:"الصوت", a11y:"وضع صوتي", approval:"المنتج", audit:"السجل", verified:"موثّق", approve:"موافقة", reject:"رفض", pending:"مسودة AI بانتظار المنتج", evidence:"الدليل", tagline:"راوي المباريات بالذكاء الاصطناعي", match:"المباراة", speed:"السرعة", fan:"مشجّع", analyst:"محلّل",
        club:"النادي", player:"اللاعب", none:"لا شيء", start:"▶ ابدأ", restart:"↻ إعادة", possession:"الاستحواذ",
        shots:"التسديدات", ontarget:"على المرمى", passes:"دقة التمرير", momentum:"الزخم", commentary:"التعليق المباشر",
        moments:"اللحظات الحاسمة · لماذا تهم", agents:"الوكلاء", fulltime:"ملخص المباراة", close:"إغلاق",
        potm:"أفضل لاعب", controlled:"منظّم", contested:"متكافئ", chaotic:"فوضوي", "fast and direct":"سريع ومباشر",
        "slow build-up":"بناء هادئ", steady:"متوازن", goal:"هدف!", xg:"xG", difficulty:"صعوبة التمريرة",
        speedAlert:"كم/س", attacks:"يهاجم"},
-  es: {audio:"Audio", a11y:"Modo audio", approval:"Productor", audit:"Registro", verified:"verificado", approve:"Aprobar", reject:"Rechazar", pending:"Borrador IA pendiente", evidence:"Evidencia", tagline:"Narrador de partidos con IA", match:"Partido", speed:"Velocidad", fan:"Aficionado", analyst:"Analista",
+  es: {audioOn:"Audio activado", a11yOn:"Modo audio activado: se leen en voz alta todas las líneas. Teclas: Espacio para empezar, S marcador, A desactivar.", auditTitle:"Registro de auditoría", aTime:"Hora", aLine:"Línea", aResult:"Verificador", aApprover:"Aprobador", aAction:"Acción", aPass:"Aprobada", aReject:"Bloqueada", aApproved:"Aprobado", aRejected:"Rechazado", aPublished:"Publicada", aWithheld:"Retenida", aAuto:"Automático", aProducer:"Productor", aEmpty:"Aún no hay entradas. Pulsa Empezar y vuelve a abrir el registro.", aNoMatch:"Empieza un partido para ver su registro.", aSum:"{c} líneas verificadas · {r} bloqueadas · {a} aprobadas · {j} rechazadas", aLoadErr:"No se pudo cargar el registro.", audio:"Audio", a11y:"Modo audio", approval:"Productor", audit:"Registro", verified:"verificado", approve:"Aprobar", reject:"Rechazar", pending:"Borrador IA pendiente", evidence:"Evidencia", tagline:"Narrador de partidos con IA", match:"Partido", speed:"Velocidad", fan:"Aficionado", analyst:"Analista",
        club:"Club", player:"Jugador", none:"Ninguno", start:"▶ Empezar", restart:"↻ Reiniciar", possession:"Posesión",
        shots:"Tiros", ontarget:"A puerta", passes:"% pases", momentum:"Impulso", commentary:"Comentario en directo",
        moments:"Momentos clave · por qué importan", agents:"Agentes", fulltime:"Resumen final", close:"Cerrar",
        potm:"Jugador del partido", controlled:"controlado", contested:"disputado", chaotic:"caótico",
        "fast and direct":"rápido y directo", "slow build-up":"elaboración lenta", steady:"estable", goal:"¡GOL!",
        xg:"xG", difficulty:"Dificultad del pase", speedAlert:"km/h", attacks:"ataca"},
-  fr: {audio:"Audio", a11y:"Mode audio", approval:"Producteur", audit:"Journal", verified:"vérifié", approve:"Valider", reject:"Rejeter", pending:"Brouillon IA en attente", evidence:"Preuve", tagline:"Le conteur de matchs IA", match:"Match", speed:"Vitesse", fan:"Supporter", analyst:"Analyste",
+  fr: {audioOn:"Audio activé", a11yOn:"Mode audio activé : chaque ligne est lue à voix haute. Touches : Espace pour lancer, S score, A désactiver.", auditTitle:"Journal d’audit", aTime:"Heure", aLine:"Ligne", aResult:"Vérificateur", aApprover:"Validé par", aAction:"Action", aPass:"Validée", aReject:"Bloquée", aApproved:"Approuvé", aRejected:"Rejeté", aPublished:"Publiée", aWithheld:"Retenue", aAuto:"Automatique", aProducer:"Producteur", aEmpty:"Aucune entrée. Lancez le match puis rouvrez le journal.", aNoMatch:"Lancez d’abord un match pour voir son journal.", aSum:"{c} lignes vérifiées · {r} bloquées · {a} approuvées · {j} rejetées", aLoadErr:"Impossible de charger le journal.", audio:"Audio", a11y:"Mode audio", approval:"Producteur", audit:"Journal", verified:"vérifié", approve:"Valider", reject:"Rejeter", pending:"Brouillon IA en attente", evidence:"Preuve", tagline:"Le conteur de matchs IA", match:"Match", speed:"Vitesse", fan:"Supporter", analyst:"Analyste",
        club:"Club", player:"Joueur", none:"Aucun", start:"▶ Coup d'envoi", restart:"↻ Rejouer", possession:"Possession",
        shots:"Tirs", ontarget:"Cadrés", passes:"% passes", momentum:"Dynamique", commentary:"Commentaire en direct",
        moments:"Moments clés · pourquoi ils comptent", agents:"Agents", fulltime:"Résumé du match", close:"Fermer",
        potm:"Homme du match", controlled:"maîtrisé", contested:"disputé", chaotic:"décousu",
        "fast and direct":"rapide et direct", "slow build-up":"construction lente", steady:"équilibré", goal:"BUT !",
        xg:"xG", difficulty:"Difficulté de passe", speedAlert:"km/h", attacks:"attaque"},
-  pt: {audio:"Áudio", a11y:"Modo áudio", approval:"Produtor", audit:"Registro", verified:"verificado", approve:"Aprovar", reject:"Rejeitar", pending:"Rascunho IA aguardando", evidence:"Evidência", tagline:"Narrador de jogos com IA", match:"Jogo", speed:"Velocidade", fan:"Torcedor", analyst:"Analista",
+  pt: {audioOn:"Áudio ligado", a11yOn:"Modo áudio ligado: todas as linhas são lidas em voz alta. Teclas: Espaço para começar, S placar, A desligar.", auditTitle:"Registro de auditoria", aTime:"Hora", aLine:"Linha", aResult:"Verificador", aApprover:"Aprovador", aAction:"Ação", aPass:"Aprovada", aReject:"Bloqueada", aApproved:"Aprovado", aRejected:"Rejeitado", aPublished:"Publicada", aWithheld:"Retida", aAuto:"Automático", aProducer:"Produtor", aEmpty:"Ainda sem registros. Clique em Começar e abra o registro de novo.", aNoMatch:"Comece um jogo para ver o registro.", aSum:"{c} linhas verificadas · {r} bloqueadas · {a} aprovadas · {j} rejeitadas", aLoadErr:"Não foi possível carregar o registro.", audio:"Áudio", a11y:"Modo áudio", approval:"Produtor", audit:"Registro", verified:"verificado", approve:"Aprovar", reject:"Rejeitar", pending:"Rascunho IA aguardando", evidence:"Evidência", tagline:"Narrador de jogos com IA", match:"Jogo", speed:"Velocidade", fan:"Torcedor", analyst:"Analista",
        club:"Clube", player:"Jogador", none:"Nenhum", start:"▶ Começar", restart:"↻ Reiniciar", possession:"Posse",
        shots:"Finalizações", ontarget:"No alvo", passes:"% passes", momentum:"Momento", commentary:"Narração ao vivo",
        moments:"Lances decisivos · por que importam", agents:"Agentes", fulltime:"Resumo do jogo", close:"Fechar",
@@ -48,6 +48,7 @@ function applyLang() {
   document.documentElement.lang = S.lang;
   document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
   if (S.replay) $("startBtn").textContent = t("restart");
   if (S.meta) { $("hintHome").textContent = `${S.meta.home.code} ${t("attacks")}`; $("hintAway").textContent = `${S.meta.away.code} ${t("attacks")}`; }
 }
@@ -96,7 +97,6 @@ async function start(startMinute = +(qs.get("start") || 0)) {
 function reconnect(keepFeed) { if (S.replay) { if (S.es) S.es.close(); if (!keepFeed) ["ticker", "cards", "overlays"].forEach((id) => ($(id).innerHTML = "")); connect(true); } }
 function connect(fromNow) {
   const p = new URLSearchParams({persona: S.persona, lang: S.lang, from_now: fromNow, approval: S.approval});
-  $("auditLink").href = `/api/replays/${S.replay}/audit`;
   if (S.club) p.set("club", S.club); if (S.player) p.set("player", S.player);
   const es = new EventSource(`/api/replays/${S.replay}/stream?${p}`); S.es = es;
   const on = (name, fn) => es.addEventListener(name, (ev) => fn(JSON.parse(ev.data)));
@@ -345,7 +345,35 @@ $("recapClose").onclick = () => $("recap").classList.add("hidden");
 seg("personaSeg", "persona");
 if (!I18N[S.lang]) S.lang = "en";
 $("langSel").value = S.lang;
-$("langSel").onchange = (e) => { S.lang = e.target.value; applyLang(); prefetchConfirm(); prodPanel(); reconnect(); };
+$("langSel").onchange = (e) => { S.lang = e.target.value; applyLang(); prefetchConfirm(); prodPanel();
+  // Switch the voice at once: drop the old-language clip + queue, the new stream speaks in the new voice.
+  if (S.audio || S.a11y) { stopSpeech(); SQ.spoken.clear(); }
+  if (!$("auditModal").classList.contains("hidden")) openAudit();
+  reconnect(); };
+// ---------------------------------------------------------------- audit log (styled, localized; never raw JSON)
+async function openAudit() {
+  const m = $("auditModal"), rows = $("auditRows"), empty = $("auditEmpty");
+  m.classList.remove("hidden"); rows.innerHTML = ""; $("auditSummary").textContent = ""; empty.classList.add("hidden");
+  if (!S.replay) { empty.textContent = t("aNoMatch"); empty.classList.remove("hidden"); $("auditClose").focus(); return; }
+  try {
+    const d = await api(`/api/replays/${S.replay}/audit?limit=300`), sm = d.summary || {};
+    $("auditSummary").textContent = t("aSum").replace("{c}", sm.verifier_checks || 0).replace("{r}", sm.verifier_rejects || 0).replace("{a}", sm.producer_approved || 0).replace("{j}", sm.producer_rejected || 0);
+    const ents = (d.entries || []).slice().reverse();
+    if (!ents.length) { empty.textContent = t("aEmpty"); empty.classList.remove("hidden"); }
+    rows.innerHTML = ents.map((a) => {
+      const prod = a.task === "producer", tm = new Date(a.ts * 1000).toLocaleTimeString(S.lang, {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+      const res = prod ? "—" : `<span class="ares ${a.verdict === "pass" ? "ok" : "bad"}">${a.verdict === "pass" ? "✓ " + t("aPass") : "✕ " + t("aReject")}</span>`;
+      const ev = prod ? "—" : ((a.evidence || []).map((x) => `<div><b>${bidi(x.claim)}</b> ← ${bidi(x.fact)}</div>`).join("") + (a.problems || []).map((x) => `<div class="aprob">⚠ ${bidi(x)}</div>`).join("")) || "—";
+      const act = prod ? (a.verdict === "approve" ? `<span class="ares ok">${t("aApproved")}</span>` : `<span class="ares bad">${t("aRejected")}</span>`) : (a.verdict === "pass" ? t("aPublished") : t("aWithheld"));
+      return `<tr><td class="at">${a.clock ? bidi(a.clock) + "<br>" : ""}<small>${tm}</small></td><td class="al">${a.text ? bidi(a.text) : "<i>" + esc(a.ref || "") + "</i>"}</td><td>${res}</td><td class="ae">${ev}</td><td>${prod ? t("aProducer") : t("aAuto")}</td><td>${act}</td></tr>`;
+    }).join("");
+  } catch (e) { empty.textContent = t("aLoadErr"); empty.classList.remove("hidden"); }
+  $("auditClose").focus();
+}
+function closeAudit() { $("auditModal").classList.add("hidden"); $("auditBtn").focus(); }
+$("auditBtn").onclick = openAudit; $("auditClose").onclick = closeAudit; $("auditX").onclick = closeAudit;
+$("auditModal").onclick = (e) => { if (e.target.id === "auditModal") closeAudit(); };
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("auditModal").classList.contains("hidden")) closeAudit(); });
 $("audioBtn").onclick = () => { S.audio = !S.audio; setTog("audioBtn", S.audio); if (S.audio) sayNow("audioOn"); else if (!S.a11y) stopSpeech(); };
 $("a11yBtn").onclick = () => a11yMode(!S.a11y);
 $("approvalBtn").onclick = () => { S.approval = !S.approval; setTog("approvalBtn", S.approval); prodPanel(); reconnect(true); };

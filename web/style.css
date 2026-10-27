@@ -107,3 +107,12 @@ body.a11y .card p{font-size:20px;color:#fff}body.a11y .grid{grid-template-column
 .producer{border:1px solid var(--acc)}.producer p{margin:4px 0 8px;font-size:13px;color:var(--mut)}
 .a11y-banner{background:#ffeb3b;color:#000;font-weight:800;font-size:20px;padding:12px 14px;border-radius:10px;margin-bottom:10px}
 .hidden{display:none!important}
+
+.audit-body{width:min(1100px,94vw);max-width:none;max-height:86vh;display:flex;flex-direction:column;gap:10px}
+.audit-head{display:flex;align-items:center;justify-content:space-between}.audit-x{background:var(--panel2);color:var(--mut);border:1px solid var(--line);border-radius:9px;padding:4px 10px;cursor:pointer;font-size:16px}
+.audit-sum{color:var(--mut);font-size:13px}.audit-scroll{overflow:auto;border:1px solid var(--line);border-radius:12px;min-height:80px}
+.audit-tbl{width:100%;border-collapse:collapse;font-size:12.5px}.audit-tbl th{position:sticky;top:0;background:var(--panel2);color:var(--acc);text-align:start;padding:8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.audit-tbl td{padding:8px;border-top:1px solid var(--line);vertical-align:top;line-height:1.45}.audit-tbl tr:nth-child(even) td{background:#ffffff06}
+.audit-tbl .at{white-space:nowrap}.audit-tbl .al{min-width:240px}.audit-tbl .ae{font-size:11.5px;color:var(--mut)}.audit-tbl .ae b{color:var(--txt,#e8ecf5);font-weight:600}
+.ares{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11px;white-space:nowrap}.ares.ok{color:var(--ok);border:1px solid #34d39977}.ares.bad{color:var(--bad);border:1px solid var(--bad)}
+.aprob{color:var(--warn)}.audit-empty{color:var(--mut)}#auditClose{align-self:flex-end}

@@ -21,7 +21,7 @@
       <button id="audioBtn" class="tog" aria-pressed="false" title="Spoken commentary (Azure AI Speech neural voices)">🔊 <span data-i18n="audio">Audio</span></button>
       <button id="a11yBtn" class="tog" aria-pressed="false" title="Audio-first accessible mode for blind and low-vision fans (key: A)">♿ <span data-i18n="a11y">Audio-first</span></button>
       <button id="approvalBtn" class="tog" aria-pressed="false" title="Producer approval: AI rewrites wait for a human OK">🎬 <span data-i18n="approval">Producer</span></button>
-      <a id="auditLink" class="tog" target="_blank" rel="noopener" title="Audit log (JSON)">📜 <span data-i18n="audit">Audit</span></a>
+      <button id="auditBtn" class="tog" type="button" aria-haspopup="dialog">📜 <span data-i18n="audit">Audit</span></button>
     </div>
     <span id="modeBadge" class="badge">offline</span>
   </div>
@@ -88,6 +88,13 @@
   <div id="trace"></div>
 </footer>
 
+<div id="auditModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="auditTitle"><div class="modal-body audit-body">
+  <div class="audit-head"><h2 id="auditTitle" data-i18n="auditTitle">Audit log</h2><button class="audit-x" id="auditX" type="button" data-i18n-aria="close" aria-label="Close">✕</button></div>
+  <div id="auditSummary" class="audit-sum"></div>
+  <div class="audit-scroll"><table class="audit-tbl"><thead><tr><th data-i18n="aTime">Time</th><th data-i18n="aLine">Line</th><th data-i18n="aResult">Verifier</th><th data-i18n="evidence">Evidence</th><th data-i18n="aApprover">Approver</th><th data-i18n="aAction">Action</th></tr></thead><tbody id="auditRows"></tbody></table></div>
+  <p id="auditEmpty" class="audit-empty hidden"></p>
+  <button class="primary" id="auditClose" data-i18n="close">Close</button>
+</div></div>
 <div id="recap" class="modal hidden"><div class="modal-body">
   <h2 data-i18n="fulltime">Full-time recap</h2>
   <div class="recap-score" id="recapScore"></div>
