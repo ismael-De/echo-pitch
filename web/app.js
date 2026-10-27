@@ -148,7 +148,7 @@ function addLine(d) {
   $("ticker").prepend(li);
   while ($("ticker").children.length > 40) $("ticker").lastChild.remove();
   S.vstats.checked += 1; vchip();
-  if (S.a11y || (S.audio && d.important)) say(d.text, d.id);
+  if (S.a11y || S.audio) say(d.text, d.id);
 }
 function wireBadge(li) { const b = li.querySelector(".vbadge"); if (b) b.onclick = () => li.querySelector(".evd").classList.toggle("hidden"); }
 function applyUpdate(u) {
@@ -179,24 +179,36 @@ const VOICE_LANG = {en: "en-GB", ar: "ar-JO", es: "es-ES", fr: "fr-FR", pt: "pt-
 const SQ = {queue: [], busy: false, audio: new Audio(), spoken: new Set(), engine: null};
 function say(text, id, isUpdate) {
   if (id && SQ.spoken.has(id) && !isUpdate) return;
-  if (isUpdate) { const q = SQ.queue.find((x) => x.id === id); if (q) { q.text = text; return; } if (SQ.spoken.has(id)) return; }
+  if (isUpdate) { const q = SQ.queue.find((x) => x.id === id); if (q) { q.text = text; q.req = ttsFetch(q); return; } if (SQ.spoken.has(id)) return; }
   if (SQ.queue.length > 3) SQ.queue.splice(0, SQ.queue.length - 3); // keep up with the live match
-  SQ.queue.push({text, id, lang: S.lang}); pump();
+  const it = {text, id, lang: S.lang}; it.req = ttsFetch(it); SQ.queue.push(it); pump();
+}
+function ttsFetch(it) {  // fetched as soon as queued, so the next line is ready when the current one ends
+  it.sent = it.text;
+  return fetch("/api/tts", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify({text: it.text.slice(0, 400), lang: it.lang})});
 }
 async function pump() {
   if (SQ.busy || !SQ.queue.length) return;
   SQ.busy = true; const it = SQ.queue.shift(); if (it.id) SQ.spoken.add(it.id);
   $("srLive").textContent = it.text;
   try {
-    const r = await fetch("/api/tts", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify({text: it.text.slice(0, 400), lang: it.lang})});
+    const r = await (it.req && it.sent === it.text ? it.req : ttsFetch(it));
     if (!r.ok) throw new Error(r.status);
     SQ.engine = "azure"; SQ.audio.src = URL.createObjectURL(await r.blob());
-    await new Promise((res) => { SQ.audio.onended = res; SQ.audio.onerror = res; SQ.audio.play().catch(res); });
+    await new Promise((res, rej) => { SQ.audio.onended = res; SQ.audio.onerror = () => rej(new Error("media")); SQ.audio.play().catch(rej); });
   } catch (e) {
     SQ.engine = "browser";
     if (window.speechSynthesis) await new Promise((res) => { const u = new SpeechSynthesisUtterance(it.text); u.lang = VOICE_LANG[it.lang]; u.onend = res; u.onerror = res; speechSynthesis.speak(u); });
   }
   SQ.busy = false; pump();
+}
+// Browsers only allow sound after a user gesture: unlock the shared <audio> element (and speechSynthesis)
+// inside the click on 🔊 / ♿ / Kick off, so later commentary can play without another tap.
+const SILENT = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
+function unlockAudio() {
+  if (SQ.unlocked) return; SQ.unlocked = true;
+  try { SQ.audio.muted = false; SQ.audio.src = SILENT; const pr = SQ.audio.play(); if (pr) pr.catch(() => { SQ.unlocked = false; }); } catch (e) { SQ.unlocked = false; }
+  try { if (window.speechSynthesis) speechSynthesis.speak(new SpeechSynthesisUtterance(" ")); } catch (e) { /* ignore */ }
 }
 function setTog(id, on) { $(id).classList.toggle("on", on); $(id).setAttribute("aria-pressed", on); }
 function a11yMode(on) { S.a11y = on; document.body.classList.toggle("a11y", on); setTog("a11yBtn", on); $("ticker").setAttribute("aria-live", on ? "polite" : "off");
@@ -288,15 +300,15 @@ $("speedSel").value = String(S.speed);
 $("speedSel").onchange = () => { if (S.replay) { const m = parseInt($("clock").textContent) || 0; start(Math.max(0, m - 1)); } };
 $("clubSel").onchange = () => { S.club = $("clubSel").value; reconnect(); };
 $("playerSel").onchange = () => { S.player = $("playerSel").value; reconnect(); };
-$("startBtn").onclick = () => start(0);
+$("startBtn").onclick = () => { if (S.audio || S.a11y) unlockAudio(); start(0); };
 $("recapClose").onclick = () => $("recap").classList.add("hidden");
 (() => { const g = document.querySelector(".stripes"); for (let i = 0; i < 105; i += 15) svg("rect", {x: i, y: 0, width: 7.5, height: 68}, g); })();
 seg("personaSeg", "persona");
 if (!I18N[S.lang]) S.lang = "en";
 $("langSel").value = S.lang;
 $("langSel").onchange = (e) => { S.lang = e.target.value; applyLang(); reconnect(); };
-$("audioBtn").onclick = () => { S.audio = !S.audio; setTog("audioBtn", S.audio); if (!S.audio) { SQ.queue = []; SQ.audio.pause(); speechSynthesis?.cancel(); } };
-$("a11yBtn").onclick = () => a11yMode(!S.a11y);
+$("audioBtn").onclick = () => { S.audio = !S.audio; if (S.audio) { unlockAudio(); say(t("audio") + " ✓"); } setTog("audioBtn", S.audio); if (!S.audio) { SQ.queue = []; SQ.audio.pause(); speechSynthesis?.cancel(); } };
+$("a11yBtn").onclick = () => { unlockAudio(); a11yMode(!S.a11y); };
 $("approvalBtn").onclick = () => { S.approval = !S.approval; setTog("approvalBtn", S.approval); reconnect(); };
 setTog("audioBtn", S.audio); setTog("approvalBtn", S.approval); if (S.a11y) a11yMode(true);
 document.addEventListener("keydown", (e) => { if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
