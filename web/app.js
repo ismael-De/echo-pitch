@@ -48,6 +48,7 @@ function applyLang() {
   document.documentElement.lang = S.lang;
   document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  ["clubSel", "playerSel"].forEach((id) => { const o = $(id).querySelector('option[value=""]'); if (o) o.textContent = t("none"); });
   document.querySelectorAll("[data-i18n-title]").forEach((el) => el.setAttribute("title", t(el.dataset.i18nTitle)));
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
   if (S.replay) $("startBtn").textContent = t("restart");

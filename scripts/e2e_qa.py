@@ -79,8 +79,8 @@ def ui(base):
                   rows=rows, english_left=left, head=txt[:80])
             pg.screenshot(path=f"/tmp/qa_audit_{lang}.png"); pg.click("#auditClose")
             if lang != "en":
-                vis = pg.inner_text("header") + pg.inner_text("#howto")
-                check(f"no_english_header_{lang}", not [w for w in ("Kick off", "Audio-first", "Producer", "How to try", "Match", "Speed") if w in vis], text=vis[:120])
+                vis = pg.inner_text("header") + pg.inner_text("#howto") + pg.eval_on_selector_all("header select option:checked", "els => els.map(e => e.textContent).join(' ')")
+                check(f"no_english_header_{lang}", not [w for w in ("Kick off", "Audio-first", "Producer", "How to try", "Match", "Speed", "None", "Restart") if w in vis], text=vis[:120])
         # toggle mashing in every order
         for seq in ["audioBtn a11yBtn approvalBtn", "approvalBtn a11yBtn audioBtn", "a11yBtn audioBtn approvalBtn a11yBtn"]:
             for _ in range(5):
