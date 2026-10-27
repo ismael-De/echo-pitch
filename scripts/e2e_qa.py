@@ -37,10 +37,10 @@ def api_probes(base):
     s, b, _ = http(base, "/api/replays/nope/audit"); check("unknown_replay_404", s == 404 and "Traceback" not in b, status=s)
     s, b, h = http(base, "/api/health", headers={"Origin": "https://evil.example"}); h = {k.lower(): v for k, v in h.items()}
     check("no_wildcard_cors", h.get("access-control-allow-origin") not in ("*", "https://evil.example"), acao=h.get("access-control-allow-origin"))
-    from concurrent.futures import ThreadPoolExecutor
-    with ThreadPoolExecutor(12) as ex:
-        codes = list(ex.map(lambda i: http(base, "/api/tts", "POST", json.dumps({"text": f"rate probe {i % 3}", "lang": "en"}).encode(),
-                                           {"X-Forwarded-For": f"203.0.113.{i}"})[0], range(70)))
+    import httpx  # one keep-alive connection = one real client IP (the test box's egress IP rotates per connection)
+    time.sleep(61)
+    with httpx.Client(timeout=20) as c:
+        codes = [c.post(base + "/api/tts", json={"text": "rate probe", "lang": "en"}, headers={"X-Forwarded-For": f"203.0.113.{i}"}).status_code for i in range(60)]
     check("tts_rate_limited_even_with_spoofed_xff", 429 in codes, first429=codes.index(429) if 429 in codes else None)
 
 
