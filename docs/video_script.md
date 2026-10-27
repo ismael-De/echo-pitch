@@ -42,3 +42,7 @@ Checklist before recording:
 | 1:37 | End card | Echo Pitch. Every match, explained, and verified, for every fan. |
 
 The Arabic clip is a real `/api/tts` response from the live app. The browser recording itself has no audio.
+
+### v3 (27 Oct 2026): `echo_pitch_demo_v3.mp4`, 1:46
+- The raw JSON audit page (1:12–1:15 in v2) is replaced by a styled audit-log card. The card is rendered from a real `GET /api/replays/{id}/audit` response on the live app (15 verifier checks, 1 producer approval).
+- The Arabic clip is a real Arabic commentary line from the live app ("يا لها من لحظة! Pavel Garrow يهزّ الشباك لـSaltmarsh FC! SHF 2-1 BRT"), spoken by `/api/tts`. The response header was `X-Voice: ar-JO-TaimNeural` (Arabic, Jordan). The text is Modern Standard Arabic, so it has a broadcast register, not a Jordanian dialect.

@@ -134,3 +134,11 @@ safe template ─────────────────► status "fal
 - Replay sessions live in memory, so the app runs as a single replica. Azure Cache for Redis would allow scale-out.
 - Templates use Latin-script names inside Arabic text. Transliteration is a planned addition.
 - Auto-eventing from video is out of scope; the event feed is synthetic.
+
+
+## v2 additions (27 Oct 2026)
+
+- **Verifier (Guard) agent** (`agents/verifier.py`), with no LLM. The orchestrator calls `_verify` on every template line, card, insight and recap, and calls `_guarded` on every LLM draft. A rejected draft is rewritten once by the same writer, with the problems as feedback. If the rewrite fails too, the verified template line stays. Verdicts are emitted as `agent_trace` (agent `verifier`). Evidence is attached to `commentary`, `commentary_update`, `moment_card` and `recap`, and every verdict is appended to the replay's audit list.
+- **Producer approval**: `stream?approval=true` sends LLM updates with `pending: true`. The UI holds them until a producer approves. Decisions go to `POST /api/replays/{id}/decisions`, and the log is at `GET /api/replays/{id}/audit`.
+- **Speech**: `POST /api/tts` (`app/tts.py`, Azure AI Speech REST, neural voices per language, LRU cache). The UI queue prefetches audio and falls back to `speechSynthesis`.
+- **MCP**: `echo_mcp/server.py` (MCP Python SDK 2.x `MCPServer`), over stdio (`python -m echo_mcp`) and stateless streamable HTTP mounted at `/mcp/`.

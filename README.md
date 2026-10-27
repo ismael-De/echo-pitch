@@ -178,7 +178,7 @@ This was run with gpt-5-mini (`scripts/foundry_mcp_demo.py`). The output is in `
 
 ## Accessibility: spoken commentary and audio-first mode
 
-- **🔊 Audio** speaks key lines with the Azure AI Speech neural voice for the selected language.
+- **🔊 Audio** speaks every commentary line and moment card with the Azure AI Speech neural voice for the selected language. Clicking the button unlocks browser audio. If the browser blocks playback, the browser's own voice is used. Arabic uses `ar-JO-TaimNeural` reading Modern Standard Arabic commentary. `scripts/e2e_audio.py` checks real playback in Chromium.
 - **♿ Audio-first** (key `A`, or `?a11y=1`) speaks every line and moment card. It switches to high-contrast large text, hides the visual-only pitch and momentum chart, and announces lines through an ARIA live region. `Space` kicks off and `S` speaks the clock and score.
 
 ## Languages
