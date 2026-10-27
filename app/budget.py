@@ -60,7 +60,16 @@ class Budget:
 
 
 def client_id(headers, host: str | None) -> str:
-    """Last X-Forwarded-For hop: the address the Container Apps ingress itself appended. Earlier hops are
-    client-supplied and spoofable, so trusting them would let anyone dodge the per-visitor limits."""
+    """Visitor address for per-visitor limits. Walk X-Forwarded-For from the right (hops our own ingress
+    appended) and take the first public address: client-supplied hops on the left are spoofable, and the
+    right-most hops are Container Apps' internal proxies (private ranges, which vary per connection)."""
+    import ipaddress
     fwd = [h.strip() for h in headers.get("x-forwarded-for", "").split(",") if h.strip()]
-    return fwd[-1] if fwd else (host or "unknown")
+    for h in reversed(fwd):
+        try:
+            ip = ipaddress.ip_address(h.split("%")[0])
+        except ValueError:
+            continue
+        if ip.is_global:
+            return str(ip)
+    return fwd[0] if fwd else (host or "unknown")

@@ -123,7 +123,7 @@ def test_budget_limits_and_release():
 
 def test_client_id_uses_ingress_appended_hop():
     from app.budget import client_id
-    assert client_id({"x-forwarded-for": "6.6.6.6, 1.2.3.4"}, "10.0.0.1") == "1.2.3.4"  # spoofed first hop ignored
+    assert client_id({"x-forwarded-for": "6.6.6.6, 1.2.3.4, 100.100.0.7, 10.0.0.9"}, "10.0.0.1") == "1.2.3.4"  # spoofed left hop + internal right hops ignored
     assert client_id({}, "9.9.9.9") == "9.9.9.9"
 
 
