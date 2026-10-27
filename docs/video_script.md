@@ -27,3 +27,18 @@ Checklist before recording:
 - Browser zoom 100%, notifications off.
 - The README jump-in link uses `start=82` (the Pavel goal is about 4 seconds in). This script uses `start=72` for the goal shot so the banner lands about 13 seconds into that shot. Leave the README link as it is.
 - Only mention GitHub Copilot if it was actually used in the repo.
+
+## v2 video (27 Oct 2026, evening): `echo_pitch_demo_v2.mp4`, 1:44, TTS narration (en-US-AndrewNeural)
+
+| Time | On screen | Narration |
+|---|---|---|
+| 0:00 | Title card | Echo Pitch is a multi-agent football storyteller on Azure AI Foundry. Version two makes every line verified, spoken, and accessible. |
+| 0:10 | Live app, Analyst, 84' at 30×, 🛡 evidence footnotes opened | Four writer agents, built with Microsoft Agent Framework, stream live commentary, moment cards and overlays. A new fifth agent, the Verifier, checks every number and every player name against the match facts before anything is shown. Click the shield, and you see the evidence behind each claim. |
+| 0:29 | "Measured, not claimed" card (docs/EVAL.md numbers) | We planted wrong numbers, scores and players into real gpt-5-mini lines … 472 of 476 were caught … zero unverified lines … groundedness 4.77 of 5 … wrong-team errors remain a known gap. |
+| 0:50 | Live app in Arabic (RTL) + an Azure Speech clip in ar-JO-TaimNeural | Fans hear it too. Azure AI Speech neural voices speak all five languages, including a Jordanian Arabic voice. |
+| 1:04 | Producer mode: a pending AI draft is approved, then the audit log | For broadcasters, producer mode holds AI rewrites for a human OK, and every verdict and decision lands in an audit log. |
+| 1:16 | Copilot CLI calling the live MCP server | The stats and the Verifier are also an MCP server … rejects a false four-one scoreline. A Foundry agent uses the same tools. |
+| 1:29 | Audio-first mode | Audio-first mode gives blind and low-vision fans large, high-contrast text, and speaks every line. |
+| 1:37 | End card | Echo Pitch. Every match, explained, and verified, for every fan. |
+
+The Arabic clip is a real `/api/tts` response from the live app. The browser recording itself has no audio.
