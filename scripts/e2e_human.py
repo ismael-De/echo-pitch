@@ -71,6 +71,7 @@ def scenario(base, lang, order):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--base", default="https://echo-pitch-web.blackriver-a826d80e.uaenorth.azurecontainerapps.io")
-    a = ap.parse_args(); res = [scenario(a.base, l, o) for l in ("en", "ar") for o in ("toggles_first", "kickoff_first")]
+    ap.add_argument("--langs", default="en,ar,ru")
+    a = ap.parse_args(); res = [scenario(a.base, l, o) for l in a.langs.split(",") for o in ("toggles_first", "kickoff_first")]
     for r in res: print(json.dumps(r, ensure_ascii=False))
     print("ALL_PASS" if all(r["ok"] for r in res) else "FAIL"); sys.exit(0 if all(r["ok"] for r in res) else 1)
